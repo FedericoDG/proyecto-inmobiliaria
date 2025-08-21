@@ -10,12 +10,27 @@ namespace inmobiliaria.Controllers
         private readonly InquilinoDao _inquilinoDao = new(config.GetConnectionString("MySqlConnection")!);
 
         // GET: /panel/inquilinos
+        // [HttpGet("")]
+        // public IActionResult Index()
+        // {
+        //     var inquilinos = _inquilinoDao.ObtenerTodos();
+        //     return View(inquilinos);
+        // }
+        // GET: /panel/inquilinos?page=1&pageSize=5
         [HttpGet("")]
-        public IActionResult Index()
+        public IActionResult Index(int page = 1, int pageSize = 2)
         {
-            var inquilinos = _inquilinoDao.ObtenerTodos();
+            var total = _inquilinoDao.ContarInquilinos();
+            var inquilinos = _inquilinoDao.ObtenerPaginados(page, pageSize);
+
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.Total = total;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)total / pageSize);
+
             return View(inquilinos);
         }
+
 
         // GET: /panel/inquilinos/crear
         [HttpGet("crear")]

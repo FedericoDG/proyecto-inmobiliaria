@@ -9,6 +9,31 @@ namespace inmobiliaria.Repositories
     {
         private readonly string _connectionString = connectionString;
 
+        public List<Inquilino> ObtenerPaginados(int page, int pageSize)
+        {
+            var lista = new List<Inquilino>();
+            using var conn = Conexion.ObtenerConexion(_connectionString);
+            using var cmd = new MySqlCommand(@"SELECT * FROM inquilinos 
+                                      WHERE activo = 1 
+                                      LIMIT @limit OFFSET @offset", conn);
+            cmd.Parameters.AddWithValue("@limit", pageSize);
+            cmd.Parameters.AddWithValue("@offset", (page - 1) * pageSize);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(MapearInquilino(reader));
+            }
+            return lista;
+        }
+
+        public int ContarInquilinos()
+        {
+            using var conn = Conexion.ObtenerConexion(_connectionString);
+            using var cmd = new MySqlCommand("SELECT COUNT(*) FROM inquilinos WHERE activo = 1", conn);
+            return Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
         public List<Inquilino> ObtenerTodos()
         {
             var lista = new List<Inquilino>();

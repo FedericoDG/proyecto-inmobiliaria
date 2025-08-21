@@ -51,24 +51,24 @@
   </tbody>
   </table>
 
-  <nav aria-label="Paginación"></nav>
-  <ul class="pagination justify-content-center">
-    <li class="page-item @(ViewBag.Page <= 1 ? "disabled" : "")">
-      <a class="page-link" href="?page=@(ViewBag.Page - 1)&pageSize=@ViewBag.PageSize">Anterior</a>
-    </li>
+    <nav aria-label="Paginación">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(ViewBag.Page <= 1 ? "disabled" : "")">
+            <a class="page-link" href="?page=@(ViewBag.Page - 1)&pageSize=@ViewBag.PageSize">Anterior</a>
+            </li>
 
-    @for (int i = 1; i <= ViewBag.TotalPages; i++)
-    {
-        <li class="page-item @(i == ViewBag.Page ? "active" : "")">
-            <a class="page-link" href="?page=@i&pageSize=@ViewBag.PageSize">@i</a>
-        </li>
-    }
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.Page ? "active" : "")">
+                    <a class="page-link" href="?page=@i&pageSize=@ViewBag.PageSize">@i</a>
+                </li>
+            }
 
-    <li class="page-item @(ViewBag.Page >= ViewBag.TotalPages ? "disabled" : "")">
-      <a class="page-link" href="?page=@(ViewBag.Page + 1)&pageSize=@ViewBag.PageSize">Siguiente</a>
-    </li>
-  </ul>
-</nav>
+            <li class="page-item @(ViewBag.Page >= ViewBag.TotalPages ? "disabled" : "")">
+            <a class="page-link" href="?page=@(ViewBag.Page + 1)&pageSize=@ViewBag.PageSize">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
 
 <!-- Modal de confirmación de borrado -->
 <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">

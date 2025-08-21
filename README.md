@@ -48,6 +48,7 @@ Credenciales por defecto (modificables en `docker-compose.yml`):
 
 El proyecto incluye un archivo script.sql con la estructura y datos iniciales.
 Podés restaurarlo de dos formas:
+
 🔹 Opción A: Desde phpMyAdmin
 
 1. Entrá en http://localhost:8080

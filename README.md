@@ -44,7 +44,24 @@ Credenciales por defecto (modificables en `docker-compose.yml`):
 - Password: 1234
 - Base de datos: inmobiliaria
 
-### 3️⃣ Configurar la conexión en `appsettings.Development.json`
+### 3️⃣ Restaurar la base de datos
+
+El proyecto incluye un archivo script.sql con la estructura y datos iniciales.
+Podés restaurarlo de dos formas:
+🔹 Opción A: Desde phpMyAdmin
+
+1. Entrá en http://localhost:8080
+2. Ingresá con las credenciales (root / 1234).
+3. Usá la pestaña Importar y cargá el archivo `script.sql`.
+
+🔹 Opción B: Desde la terminal
+
+```bash
+docker exec -i mysql mysql -uroot -p1234 -e "CREATE DATABASE inmobiliaria;"
+docker exec -i mysql mysql -uroot -p1234 inmobiliaria < script.sql
+```
+
+### 4️⃣ Configurar la conexión en `appsettings.Development.json`
 
 ```json
 "ConnectionStrings": {
@@ -52,14 +69,14 @@ Credenciales por defecto (modificables en `docker-compose.yml`):
 }
 ```
 
-### 4️⃣ Restaurar dependencias y compilar
+### 5️⃣ Restaurar dependencias y compilar
 
 ```bash
 dotnet restore
 dotnet build
 ```
 
-### 5️⃣ Ejecutar el proyecto
+### 6️⃣ Ejecutar el proyecto
 
 ```bash
 dotnet run

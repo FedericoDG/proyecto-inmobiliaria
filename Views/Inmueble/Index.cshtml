@@ -1,0 +1,91 @@
+@model IEnumerable<inmobiliaria.Models.Inmueble>
+@{
+    ViewData["Title"] = "Lista de Inmuebles";
+    Layout = "~/Views/Panel/_Layout.cshtml";
+}
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+        @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+<h1 class="text-center fs-3">INMUEBLES</h1>
+
+<div class="d-flex justify-content-end mb-2">
+  <a class="btn btn-primary" href="/panel/inmuebles/crear">Nuevo inmueble</a>
+</div>
+
+<table class="table table-striped">
+  <thead>
+      <tr>
+          <th>ID</th>
+          <th>Propietario</th>
+          <th>Tipo</th>
+          <th>Uso</th>
+          <th>Dirección</th>
+          <th>Ambientes</th>
+          <th>Coordenadas</th>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+      </tr>
+  </thead>
+  <tbody>
+      @foreach (var inm in Model)
+      {
+          <tr>
+              <td>@inm.IdInmueble</td>
+              <td>@inm.IdPropietario</td>
+              <td>@inm.IdTipo</td>
+              <td>@inm.Uso</td>
+              <td>@inm.Direccion</td>
+              <td>@inm.CantidadAmbientes</td>
+              <td>@inm.Coordenadas</td>
+              <td>@inm.Precio</td>
+              <td>@inm.Estado</td>
+              <td>
+                  <a class="btn btn-outline-primary btn-sm" href="/panel/inmuebles/editar/@inm.IdInmueble">Editar</a>
+                  <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar" data-id="@inm.IdInmueble" data-nombre="@inm.Direccion">Eliminar</button>
+              </td>
+          </tr>
+      }
+  </tbody>
+  </table>
+
+<!-- Modal de confirmación de borrado -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEliminarLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro que deseas eliminar el inmueble <span id="nombreInmueble"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="formEliminar" method="post">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+  const modalEliminar = document.getElementById('modalEliminar');
+  modalEliminar.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const id = button.getAttribute('data-id');
+    const nombre = button.getAttribute('data-nombre');
+    document.getElementById('nombreInmueble').textContent = nombre;
+    const form = document.getElementById('formEliminar');
+    form.action = '/panel/inmuebles/eliminar/' + id;
+  });
+</script>
+}

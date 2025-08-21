@@ -1,0 +1,65 @@
+@{
+  Layout = "~/Views/Autenticacion/_Layout.cshtml";
+}
+@{
+  ViewData["Title"] = "Acceso";
+}
+
+<h1 class="text-center fs-3">ACCESO</h1>
+
+@if (ViewBag.Mensaje != null)
+{
+  <div class="alert alert-danger">@ViewBag.Mensaje</div>
+}
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <form method="post">
+      <div class="mb-3">
+        <label for="email" class="form-label">Correo electrónico:</label>
+        <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp">
+      </div>
+      <div class="mb-3">
+        <label for="contrasena" class="form-label">Contraseña:</label>
+        <input type="password" class="form-control" id="contrasena" name="contrasena">
+      </div>
+      <button type="submit" class="btn btn-primary">INGRESAR</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Credenciales de prueba -->
+<div class="">
+  <table class="table table-sm table-bordered mt-2 mb-0">
+    <thead>
+      <tr>
+        <th>Correo electrónico</th>
+        <th>Contraseña</th>
+        <th>Rol</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>administrador@mail.com</td>
+        <td>1234</td>
+        <td>Administrador</td>
+      </tr>
+      <tr>
+        <td>usuario1@mail.com</td>
+        <td>1234</td>
+        <td>Usuario</td>
+      </tr>
+      <tr>
+        <td>usuario2@mail.com</td>
+        <td>1234</td>
+        <td>Usuario</td>
+      </tr>
+
+    </tbody>
+  </table>
+  <small>Utiliza estas credenciales de prueba para acceder.</small>
+</div>
+

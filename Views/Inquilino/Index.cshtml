@@ -1,0 +1,87 @@
+@model IEnumerable<inmobiliaria.Models.Inquilino>
+@{
+    ViewData["Title"] = "Lista de Inquilinos";
+    Layout = "~/Views/Panel/_Layout.cshtml";
+}
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+        @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+<h1 class="text-center fs-3">INQUILINOS</h1>
+
+<div class="d-flex justify-content-end mb-2">
+  <a class="btn btn-primary" href="/panel/inquilinos/crear">Nuevo inquilino</a>
+</div>
+
+<table class="table table-striped">
+  <thead>
+      <tr>
+          <th>ID</th>
+          <th>DNI</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Teléfono</th>
+          <th>Email</th>
+          <th>Dirección</th>
+          <th>Acciones</th>
+      </tr>
+  </thead>
+  <tbody>
+      @foreach (var i in Model)
+      {
+          <tr>
+              <td>@i.IdInquilino</td>
+              <td>@i.Dni</td>
+              <td>@i.Nombre</td>
+              <td>@i.Apellido</td>
+              <td>@i.Telefono</td>
+              <td>@i.Email</td>
+              <td>@i.Direccion</td>
+              <td>
+                  <a class="btn btn-outline-primary btn-sm" href="/panel/inquilinos/editar/@i.IdInquilino">Editar</a>
+                  <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar" data-id="@i.IdInquilino" data-nombre="@i.Nombre @i.Apellido">Eliminar</button>
+              </td>
+          </tr>
+      }
+  </tbody>
+  </table>
+
+<!-- Modal de confirmación de borrado -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEliminarLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro que deseas eliminar al inquilino <span id="nombreInquilino"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="formEliminar" method="post">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+  const modalEliminar = document.getElementById('modalEliminar');
+  modalEliminar.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const id = button.getAttribute('data-id');
+    const nombre = button.getAttribute('data-nombre');
+    document.getElementById('nombreInquilino').textContent = nombre;
+    const form = document.getElementById('formEliminar');
+    form.action = '/panel/inquilinos/eliminar/' + id;
+  });
+</script>
+}

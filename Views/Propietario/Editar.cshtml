@@ -1,0 +1,49 @@
+@model inmobiliaria.Models.Propietario
+@{
+    ViewData["Title"] = "Editar Propietario";
+    Layout = "~/Views/Panel/_Layout.cshtml";
+}
+
+<h1 class="text-center fs-3">EDITAR PROPIETARIO</h1>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <form asp-action="Editar" method="post">
+          <input type="hidden" asp-for="IdPropietario" />
+          <div class="mb-3">
+              <label asp-for="Dni" class="form-label"></label>
+              <input asp-for="Dni" class="form-control" readonly />
+              <span asp-validation-for="Dni" class="text-danger"></span>
+          </div>
+          <div class="mb-3">
+              <label asp-for="Nombre" class="form-label"></label>
+              <input asp-for="Nombre" class="form-control" />
+              <span asp-validation-for="Nombre" class="text-danger"></span>
+          </div>
+          <div class="mb-3">
+              <label asp-for="Apellido" class="form-label"></label>
+              <input asp-for="Apellido" class="form-control" />
+              <span asp-validation-for="Apellido" class="text-danger"></span>
+          </div>
+          <div class="mb-3">
+              <label asp-for="Telefono" class="form-label"></label>
+              <input asp-for="Telefono" class="form-control" />
+              <span asp-validation-for="Telefono" class="text-danger"></span>
+          </div>
+          <div class="mb-3">
+              <label asp-for="Email" class="form-label"></label>
+              <input asp-for="Email" class="form-control" />
+              <span asp-validation-for="Email" class="text-danger"></span>
+          </div>
+          <div class="mb-3">
+              <label asp-for="Direccion" class="form-label"></label>
+              <input asp-for="Direccion" class="form-control" />
+              <span asp-validation-for="Direccion" class="text-danger"></span>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <a href="/panel/propietarios" class="btn btn-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+@model inmobiliaria.Models.Inmueble
+@{
+    ViewData["Title"] = "Crear Inmueble";
+    Layout = "~/Views/Panel/_Layout.cshtml";
+}
+
+<h1 class="text-center fs-3">NUEVO INMUEBLE</h1>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <form asp-action="Crear" method="post">
+    <div class="form-group mb-3">
+  <label for="input-propietario">Propietario</label>
+  <input type="text" class="form-control" placeholder="Propietario" id="input-propietario" autocomplete="off" />
+  <input type="hidden" name="IdPropietario" id="id-propietario-hidden" />
+  <span asp-validation-for="IdPropietario" class="text-danger"></span>
+    </div>
+        <div class="mb-3">
+          <label asp-for="IdTipo" class="form-label"></label>
+          <select asp-for="IdTipo" class="form-select">
+            <option value="">Seleccione tipo de inmueble</option>
+            @foreach (var t in ViewBag.TiposInmueble)
+            {
+                <option value="@t.IdTipo">@t.Nombre</option>
+            }
+          </select>
+          <span asp-validation-for="IdTipo" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="Uso" class="form-label"></label>
+          <select asp-for="Uso" class="form-select">
+            <option value="">Seleccione uso</option>
+            <option value="residencial">Residencial</option>
+            <option value="comercial">Comercial</option>
+          </select>
+          <span asp-validation-for="Uso" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="Direccion" class="form-label"></label>
+          <input asp-for="Direccion" class="form-control" />
+          <span asp-validation-for="Direccion" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="CantidadAmbientes" class="form-label"></label>
+          <input asp-for="CantidadAmbientes" class="form-control" />
+          <span asp-validation-for="CantidadAmbientes" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="Coordenadas" class="form-label"></label>
+          <input asp-for="Coordenadas" class="form-control" />
+          <span asp-validation-for="Coordenadas" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="Precio" class="form-label"></label>
+          <input asp-for="Precio" class="form-control" />
+          <span asp-validation-for="Precio" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="Estado" class="form-label"></label>
+          <select asp-for="Estado" class="form-select">
+            <option value="">Seleccione estado</option>
+            <option value="disponible">Disponible</option>
+            <option value="suspendido">Suspendido</option>
+            <option value="ocupado">Ocupado</option>
+          </select>
+          <span asp-validation-for="Estado" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Crear</button>
+        <a href="/panel/inmuebles" class="btn btn-secondary">Cancelar</a>
+      </form>
+      </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+    @section Scripts {
+      <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+      <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+      <script>
+        $(function () {
+          var propietarios = [
+            @foreach (var p in ViewBag.Propietarios)
+            {
+              @: { label: "@Html.Raw(p.Nombre.Replace("\"", "\\\"") + " " + p.Apellido.Replace("\"", "\\\"") + " (" + p.Dni + ")")", value: "@p.IdPropietario" },
+            }
+          ];
+          $("#input-propietario").autocomplete({
+            source: propietarios,
+            minLength: 1,
+            select: function (event, ui) {
+              $(this).val(ui.item.label);
+              $('#id-propietario-hidden').val(ui.item.value);
+              return false;
+            }
+          });
+          // Si el usuario borra el campo, borra el hidden
+          $('#input-propietario').on('input', function() {
+            if (!$(this).val()) {
+              $('#id-propietario-hidden').val('');
+            }
+          });
+        });
+      </script>
+    }

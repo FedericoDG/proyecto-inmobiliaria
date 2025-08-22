@@ -11,11 +11,11 @@ namespace inmobiliaria.Models
 
         [Required(ErrorMessage = "El ID del propietario es obligatorio")]
         [Column("id_propietario")]
-        public int IdPropietario { get; set; }
+        public int? IdPropietario { get; set; }
 
         [Required(ErrorMessage = "El ID del tipo es obligatorio")]
         [Column("id_tipo")]
-        public int IdTipo { get; set; }
+        public int? IdTipo { get; set; }
 
         [Required(ErrorMessage = "El uso es obligatorio")]
         [Column("uso")]
@@ -35,7 +35,7 @@ namespace inmobiliaria.Models
 
         [Required(ErrorMessage = "El precio es obligatorio")]
         [Column("precio")]
-        public decimal Precio { get; set; }
+        public decimal? Precio { get; set; }
 
         [Column("estado")]
         public string? Estado { get; set; } // Enum: disponible, suspendido, ocupado

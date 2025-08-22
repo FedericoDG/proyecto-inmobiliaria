@@ -16,6 +16,11 @@ namespace inmobiliaria.Controllers
     public IActionResult Index()
     {
       var inmuebles = _inmuebleDao.ObtenerTodos();
+      var propietarios = _propietarioDao.ObtenerTodos();
+      var tipos = _tipoInmuebleDao.ObtenerTodos();
+      ViewBag.Propietarios = propietarios;
+      ViewBag.TiposInmueble = tipos;
+
       return View(inmuebles);
     }
 
@@ -34,6 +39,10 @@ namespace inmobiliaria.Controllers
     [HttpPost("crear")]
     public IActionResult Crear(Inmueble inmueble)
     {
+      // if (ModelState.IsValid)
+      // {
+
+      // }
       if (inmueble.Uso != "residencial" && inmueble.Uso != "comercial")
       {
         ModelState.AddModelError("Uso", "El uso debe ser 'residencial' o 'comercial'.");

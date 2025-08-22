@@ -31,40 +31,19 @@
               <input type="hidden" name="IdPropietario" id="id-propietario-hidden" value="@Model.IdPropietario" />
               <span asp-validation-for="IdPropietario" class="text-danger"></span>
           </div>
-@section Scripts {
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-    <script>
-        $(function () {
-            var propietarios = [
-                @foreach (var p in ViewBag.Propietarios)
-                {
-                    @: { label: "@Html.Raw(p.Nombre.Replace("\"", "\\\"") + " " + p.Apellido.Replace("\"", "\\\"") + " (" + p.Dni + ")")", value: "@p.IdPropietario" },
-                }
-            ];
-            $("#input-propietario").autocomplete({
-                source: propietarios,
-                minLength: 1,
-                select: function (event, ui) {
-                    $(this).val(ui.item.label);
-                    $('#id-propietario-hidden').val(ui.item.value);
-                    return false;
-                }
-            });
-            // Si el usuario borra el campo, borra el hidden
-            $('#input-propietario').on('input', function() {
-                if (!$(this).val()) {
-                    $('#id-propietario-hidden').val('');
-                }
-            });
-        });
-    </script>
-}
-          <div class="mb-3">
-              <label asp-for="IdTipo" class="form-label"></label>
-              <input asp-for="IdTipo" class="form-control" />
-              <span asp-validation-for="IdTipo" class="text-danger"></span>
-          </div>
+         <div class="mb-3">
+    <label asp-for="IdTipo" class="form-label"></label>
+    <select asp-for="IdTipo" class="form-select">
+        <option value="">Seleccione tipo de inmueble</option>
+        @foreach (var t in ViewBag.TiposInmueble)
+        {
+            <option value="@t.IdTipo" selected="@(t.IdTipo == Model.IdTipo ? "selected" : null)">
+                @t.Nombre
+            </option>
+        }
+    </select>
+    <span asp-validation-for="IdTipo" class="text-danger"></span>
+</div>
                     <div class="mb-3">
                             <label asp-for="Uso" class="form-label"></label>
                             <select asp-for="Uso" class="form-select">
@@ -108,3 +87,33 @@
     </div>
   </div>
 </div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script>
+        $(function () {
+            var propietarios = [
+                @foreach (var p in ViewBag.Propietarios)
+                {
+                    @: { label: "@Html.Raw(p.Nombre.Replace("\"", "\\\"") + " " + p.Apellido.Replace("\"", "\\\"") + " (" + p.Dni + ")")", value: "@p.IdPropietario" },
+                }
+            ];
+            $("#input-propietario").autocomplete({
+                source: propietarios,
+                minLength: 1,
+                select: function (event, ui) {
+                    $(this).val(ui.item.label);
+                    $('#id-propietario-hidden').val(ui.item.value);
+                    return false;
+                }
+            });
+            // Si el usuario borra el campo, borra el hidden
+            $('#input-propietario').on('input', function() {
+                if (!$(this).val()) {
+                    $('#id-propietario-hidden').val('');
+                }
+            });
+        });
+    </script>
+}

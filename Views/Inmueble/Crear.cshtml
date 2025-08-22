@@ -17,7 +17,7 @@
   <span asp-validation-for="IdPropietario" class="text-danger"></span>
     </div>
         <div class="mb-3">
-          <label asp-for="IdTipo" class="form-label"></label>
+          <label asp-for="IdTipo" class="form-label">Tipo</label>
           <select asp-for="IdTipo" class="form-select">
             <option value="">Seleccione tipo de inmueble</option>
             @foreach (var t in ViewBag.TiposInmueble)
@@ -42,7 +42,7 @@
           <span asp-validation-for="Direccion" class="text-danger"></span>
         </div>
         <div class="mb-3">
-          <label asp-for="CantidadAmbientes" class="form-label"></label>
+          <label asp-for="CantidadAmbientes" class="form-label">Cantidad de Ambientes</label>
           <input asp-for="CantidadAmbientes" class="form-control" />
           <span asp-validation-for="CantidadAmbientes" class="text-danger"></span>
         </div>

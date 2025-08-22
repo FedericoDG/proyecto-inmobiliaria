@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using inmobiliaria.Models;
 using inmobiliaria.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;

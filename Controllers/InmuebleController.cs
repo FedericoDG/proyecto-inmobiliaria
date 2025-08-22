@@ -5,18 +5,11 @@ using inmobiliaria.Repositories;
 namespace inmobiliaria.Controllers
 {
   [Route("panel/inmuebles")]
-  public class InmuebleController : Controller
+  public class InmuebleController(IConfiguration config) : Controller
   {
-    private readonly InmuebleDao _inmuebleDao;
-    private readonly PropietarioDao _propietarioDao;
-    private readonly TipoInmuebleDao _tipoInmuebleDao;
-
-    public InmuebleController(IConfiguration config)
-    {
-      _inmuebleDao = new InmuebleDao(config.GetConnectionString("MySqlConnection")!);
-      _propietarioDao = new PropietarioDao(config.GetConnectionString("MySqlConnection")!);
-      _tipoInmuebleDao = new TipoInmuebleDao(config.GetConnectionString("MySqlConnection")!);
-    }
+    private readonly InmuebleDao _inmuebleDao = new(config.GetConnectionString("MySqlConnection")!);
+    private readonly PropietarioDao _propietarioDao = new(config.GetConnectionString("MySqlConnection")!);
+    private readonly TipoInmuebleDao _tipoInmuebleDao = new(config.GetConnectionString("MySqlConnection")!);
 
     // GET: /panel/inmuebles
     [HttpGet("")]

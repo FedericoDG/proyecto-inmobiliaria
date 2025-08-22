@@ -1,7 +1,6 @@
 using System;
 using System.Data;
 using MySql.Data.MySqlClient;
-using System.Collections.Generic;
 using inmobiliaria.Data;
 using inmobiliaria.Models;
 using Microsoft.AspNetCore.Identity;

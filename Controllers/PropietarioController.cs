@@ -5,14 +5,9 @@ using inmobiliaria.Repositories;
 namespace inmobiliaria.Controllers
 {
   [Route("panel/propietarios")]
-  public class PropietarioController : Controller
+  public class PropietarioController(IConfiguration config) : Controller
   {
-    private readonly PropietarioDao _propietarioDao;
-
-    public PropietarioController(IConfiguration config)
-    {
-      _propietarioDao = new PropietarioDao(config.GetConnectionString("MySqlConnection")!);
-    }
+    private readonly PropietarioDao _propietarioDao = new(config.GetConnectionString("MySqlConnection")!);
 
     // GET: /panel/propietarios?page=1&pageSize=10
     [HttpGet("")]

@@ -95,6 +95,20 @@ namespace inmobiliaria.Repositories
             return cmd.ExecuteNonQuery() > 0;
         }
 
+        public List<Inquilino> BuscarPorDni(string dni)
+        {
+            var lista = new List<Inquilino>();
+            using var conn = Conexion.ObtenerConexion(_connectionString);
+            using var cmd = new MySqlCommand("SELECT * FROM inquilinos WHERE dni LIKE @dni AND activo = 1", conn);
+            cmd.Parameters.AddWithValue("@dni", $"%{dni}%");
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(MapearInquilino(reader));
+            }
+            return lista;
+        }
+
         private static Inquilino MapearInquilino(IDataRecord reader)
         {
             return new Inquilino

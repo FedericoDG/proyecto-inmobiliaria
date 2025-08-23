@@ -74,6 +74,21 @@ namespace inmobiliaria.Repositories
             return cmd.ExecuteNonQuery() > 0;
         }
 
+        public List<Inmueble> BuscarPorDireccion(string direccion)
+        {
+            var lista = new List<Inmueble>();
+            using var conn = Conexion.ObtenerConexion(_connectionString);
+            using var cmd = new MySqlCommand("SELECT * FROM inmuebles WHERE direccion LIKE @direccion AND activo = 1", conn);
+            cmd.Parameters.AddWithValue("@direccion", $"%{direccion}%");
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(MapearInmueble(reader));
+            }
+            return lista;
+        }
+
+
         private static Inmueble MapearInmueble(IDataRecord reader)
         {
             return new Inmueble

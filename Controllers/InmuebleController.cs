@@ -117,5 +117,13 @@ namespace inmobiliaria.Controllers
       _inmuebleDao.EliminarInmueble(id);
       return RedirectToAction("Index");
     }
+
+    [HttpGet("buscar-por-direccion")]
+    public IActionResult BuscarPorDireccion(string direccion)
+    {
+      var inmuebles = _inmuebleDao.BuscarPorDireccion(direccion);
+      var resultado = inmuebles.Select(i => new { idInmueble = i.IdInmueble, direccion = i.Direccion }).ToList();
+      return Json(resultado);
+    }
   }
 }

@@ -10,14 +10,20 @@
     <div class="col-md-8">
       <form asp-action="Crear" method="post">
         <div class="form-group mb-3">
-          <label for="input-inquilino">Inquilino</label>
-          <input type="text" class="form-control" placeholder="Inquilino" id="input-inquilino" autocomplete="off" />
+          <label for="input-dni-inquilino">Buscar inquilino por DNI</label>
+          <input type="text" class="form-control" id="input-dni-inquilino" autocomplete="off" placeholder="Escriba DNI" />
+          <select class="form-select mt-2" id="select-inquilino" size="3">
+            <option value="">Seleccione inquilino</option>
+          </select>
           <input type="hidden" name="IdInquilino" id="id-inquilino-hidden" />
           <span asp-validation-for="IdInquilino" class="text-danger"></span>
         </div>
         <div class="form-group mb-3">
-          <label for="input-inmueble">Inmueble</label>
-          <input type="text" class="form-control" placeholder="Inmueble" id="input-inmueble" autocomplete="off" />
+          <label for="input-direccion-inmueble">Buscar inmueble por dirección</label>
+          <input type="text" class="form-control" id="input-direccion-inmueble" autocomplete="off" placeholder="Escriba dirección" />
+          <select class="form-select mt-2" id="select-inmueble" size="3">
+            <option value="">Seleccione inmueble</option>
+          </select>
           <input type="hidden" name="IdInmueble" id="id-inmueble-hidden" />
           <span asp-validation-for="IdInmueble" class="text-danger"></span>
         </div>
@@ -50,57 +56,105 @@
 </div>
 
 @section Scripts {
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
-  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
   <script>
-    $(function () {
-      var inquilinos = [
-        @foreach (var i in ViewBag.Inquilinos)
-        {
-          @: { label: "@Html.Raw(i.Nombre.Replace("\"", "\\\"") + " " + i.Apellido.Replace("\"", "\\\"") + " (" + i.Dni + ")")", value: "@i.IdInquilino" },
-        }
-      ];
-      $("#input-inquilino").autocomplete({
-        source: inquilinos,
-        minLength: 1,
-        select: function (event, ui) {
-          $(this).val(ui.item.label);
-          $('#id-inquilino-hidden').val(ui.item.value);
-          return false;
-        }
-      });
-      $('#input-inquilino').on('input', function() {
-        if (!$(this).val()) {
-          $('#id-inquilino-hidden').val('');
-        }
+    document.addEventListener('DOMContentLoaded', function () {
+      // INQUILINO: búsqueda por DNI y select desplegado
+      const inputDni = document.getElementById('input-dni-inquilino');
+      const selectInq = document.getElementById('select-inquilino');
+      const hiddenIdInq = document.getElementById('id-inquilino-hidden');
+      let debounceTimeout;
+
+      inputDni.addEventListener('input', function () {
+        const dni = inputDni.value;
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => {
+          if (dni.length >= 3) { // TODO: Sacar este "magic number" a una constante
+            fetch(`/panel/inquilinos/buscar-por-dni?dni=${encodeURIComponent(dni)}`)
+              .then(res => res.json())
+              .then(data => {
+                selectInq.innerHTML = '';
+                if (data.length === 0) {
+                  const option = document.createElement('option');
+                  option.value = '';
+                  option.textContent = 'No se encontraron inquilinos';
+                  selectInq.appendChild(option);
+                } else {
+                  data.forEach(i => {
+                    const option = document.createElement('option');
+                    option.value = i.idInquilino;
+                    option.textContent = `${i.nombre} ${i.apellido} (${i.dni})`;
+                    selectInq.appendChild(option);
+                  });
+                }
+              });
+          } else {
+            selectInq.innerHTML = '';
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'Seleccione inquilino';
+            selectInq.appendChild(option);
+          }
+          hiddenIdInq.value = '';
+        }, 350); // TODO: Sacar este "magic number" que representa el debounce a una constante
       });
 
-      var inmuebles = [
-        @foreach (var inm in ViewBag.Inmuebles)
-        {
-        @: { label: "@Html.Raw(inm.Direccion + " (" + inm.TipoNombre + ")")", value: "@inm.IdInmueble" },
-        }
-      ];
-      $("#input-inmueble").autocomplete({
-        source: inmuebles,
-        minLength: 1,
-        select: function (event, ui) {
-          $(this).val(ui.item.label);
-          $('#id-inmueble-hidden').val(ui.item.value);
-          // Obtener el precio
-          $.get(`/panel/inmuebles/obtener-precio/${ui.item.value}`, function (data) {
-            console.log(data);
-            if (data && data.precio !== undefined) {
-              $('#MontoMensual').val(data.precio);
-            }
-          });
-          return false;
-        }
+      selectInq.addEventListener('change', function () {
+        hiddenIdInq.value = selectInq.value;
       });
-      $('#input-inmueble').on('input', function() {
-        if (!$(this).val()) {
-          $('#id-inmueble-hidden').val('');
-          $('#MontoMensual').val('');
+
+      const inputDir = document.getElementById('input-direccion-inmueble');
+      const selectInm = document.getElementById('select-inmueble');
+      const hiddenIdInm = document.getElementById('id-inmueble-hidden');
+      let debounceTimeoutInm;
+
+      inputDir.addEventListener('input', function () {
+        const direccion = inputDir.value;
+        clearTimeout(debounceTimeoutInm);
+        debounceTimeoutInm = setTimeout(() => {
+          if (direccion.length >= 3) {  // TODO: Sacar este "magic number" a una constante
+            fetch(`/panel/inmuebles/buscar-por-direccion?direccion=${encodeURIComponent(direccion)}`)
+              .then(res => res.json())
+              .then(data => {
+                selectInm.innerHTML = '';
+                if (data.length === 0) {
+                  const option = document.createElement('option');
+                  option.value = '';
+                  option.textContent = 'No se encontraron inmuebles';
+                  selectInm.appendChild(option);
+                } else {
+                  data.forEach(i => {
+                    const option = document.createElement('option');
+                    option.value = i.idInmueble;
+                    option.textContent = i.direccion;
+                    selectInm.appendChild(option);
+                  });
+                }
+              });
+          } else {
+            selectInm.innerHTML = '';
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'Seleccione inmueble';
+            selectInm.appendChild(option);
+          }
+          hiddenIdInm.value = '';
+        }, 350);  // TODO: Sacar este "magic number" que representa el debounce a una constante
+          });
+      });
+
+      selectInm.addEventListener('change', function () {
+        hiddenIdInm.value = selectInm.value;
+        // Obtener el precio para ponerlo como "sugerencia"
+        if (selectInm.value) {
+          fetch(`/panel/inmuebles/obtener-precio/${selectInm.value}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data && data.precio !== undefined) {
+                document.getElementById('MontoMensual').value = data.precio;
+              }
+            });
+        } else {
+          document.getElementById('MontoMensual').value = '';
         }
       });
     });

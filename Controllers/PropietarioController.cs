@@ -24,6 +24,14 @@ namespace inmobiliaria.Controllers
       return View(propietarios);
     }
 
+    [HttpGet("buscar-por-dni")]
+    public IActionResult BuscarPorDni(string dni)
+    {
+      var propietarios = _propietarioDao.BuscarPorDni(dni);
+      var resultado = propietarios.Select(p => new { idPropietario = p.IdPropietario, nombre = p.Nombre, apellido = p.Apellido, dni = p.Dni }).ToList();
+      return Json(resultado);
+    }
+
     // GET: /panel/propietarios
     // [HttpGet("")]
     // public IActionResult Index()

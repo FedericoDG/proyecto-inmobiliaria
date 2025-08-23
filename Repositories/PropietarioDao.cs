@@ -58,6 +58,20 @@ namespace inmobiliaria.Repositories
             return null;
         }
 
+        public List<Propietario> BuscarPorDni(string dni)
+        {
+            var lista = new List<Propietario>();
+            using var conn = Conexion.ObtenerConexion(_connectionString);
+            using var cmd = new MySqlCommand("SELECT * FROM propietarios WHERE dni LIKE @dni AND activo = 1", conn);
+            cmd.Parameters.AddWithValue("@dni", $"%{dni}%");
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(MapearPropietario(reader));
+            }
+            return lista;
+        }
+
         public bool CrearPropietario(Propietario propietario)
         {
             using var conn = Conexion.ObtenerConexion(_connectionString);

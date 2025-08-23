@@ -11,15 +11,18 @@
     <div class="col-md-6">
       <form asp-action="Crear" method="post">
     <div class="form-group mb-3">
-  <label for="input-propietario">Propietario</label>
-  <input type="text" class="form-control" placeholder="Propietario" id="input-propietario" autocomplete="off" />
-  <input type="hidden" name="IdPropietario" id="id-propietario-hidden" />
-  <span asp-validation-for="IdPropietario" class="text-danger"></span>
+      <label for="input-dni-propietario">Buscar propietario por DNI</label>
+      <input type="text" class="form-control" id="input-dni-propietario" autocomplete="off" placeholder="Escriba DNI" />
+      <select class="form-select mt-2" id="select-propietario" size="3">
+        <option value="">Seleccione propietario</option>
+      </select>
+      <input type="hidden" name="IdPropietario" id="id-propietario-hidden" />
+      <span asp-validation-for="IdPropietario" class="text-danger"></span>
     </div>
         <div class="mb-3">
           <label asp-for="IdTipo" class="form-label">Tipo</label>
           <select asp-for="IdTipo" class="form-select">
-            <option value="">Seleccione tipo de inmueble</option>
+            @* <option value="">Seleccione tipo de inmueble</option> *@
             @foreach (var t in ViewBag.TiposInmueble)
             {
                 <option value="@t.IdTipo">@t.Nombre</option>
@@ -28,12 +31,15 @@
           <span asp-validation-for="IdTipo" class="text-danger"></span>
         </div>
         <div class="mb-3">
-          <label asp-for="Uso" class="form-label"></label>
-          <select asp-for="Uso" class="form-select">
-            <option value="">Seleccione uso</option>
-            <option value="residencial">Residencial</option>
-            <option value="comercial">Comercial</option>
-          </select>
+            <label asp-for="Uso" class="form-label">Uso</label><br />
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="Uso" id="radio-uso-residencial" value="residencial" checked />
+              <label class="form-check-label" for="radio-uso-residencial">Residencial</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="Uso" id="radio-uso-comercial" value="comercial" />
+              <label class="form-check-label" for="radio-uso-comercial">Comercial</label>
+            </div>
           <span asp-validation-for="Uso" class="text-danger"></span>
         </div>
         <div class="mb-3">
@@ -60,7 +66,7 @@
           <label asp-for="Estado" class="form-label"></label>
           <select asp-for="Estado" class="form-select">
             <option value="">Seleccione estado</option>
-            <option value="disponible">Disponible</option>
+            <option value="disponible" selected>Disponible</option>
             <option value="suspendido">Suspendido</option>
             <option value="ocupado">Ocupado</option>
           </select>
@@ -77,30 +83,49 @@
 </div>
 
     @section Scripts {
-      <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
-      <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
       <script>
-        $(function () {
-          var propietarios = [
-            @foreach (var p in ViewBag.Propietarios)
-            {
-              @: { label: "@Html.Raw(p.Nombre.Replace("\"", "\\\"") + " " + p.Apellido.Replace("\"", "\\\"") + " (" + p.Dni + ")")", value: "@p.IdPropietario" },
-            }
-          ];
-          $("#input-propietario").autocomplete({
-            source: propietarios,
-            minLength: 1,
-            select: function (event, ui) {
-              $(this).val(ui.item.label);
-              $('#id-propietario-hidden').val(ui.item.value);
-              return false;
-            }
+        document.addEventListener('DOMContentLoaded', function () {
+          const inputDni = document.getElementById('input-dni-propietario');
+          const selectProp = document.getElementById('select-propietario');
+          const hiddenId = document.getElementById('id-propietario-hidden');
+          let debounceTimeout;
+
+          inputDni.addEventListener('input', function () {
+            const dni = inputDni.value;
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+              if (dni.length >= 3) { // TODO: Sacar este "magic number" a una constante
+                fetch(`/panel/propietarios/buscar-por-dni?dni=${encodeURIComponent(dni)}`)
+                  .then(res => res.json())
+                  .then(data => {
+                    selectProp.innerHTML = '';
+                    if (data.length === 0) {
+                      const option = document.createElement('option');
+                      option.value = '';
+                      option.textContent = 'No se encontraron propietarios';
+                      selectProp.appendChild(option);
+                    } else {
+                      data.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.idPropietario;
+                        option.textContent = `${p.nombre} ${p.apellido} (${p.dni})`;
+                        selectProp.appendChild(option);
+                      });
+                    }
+                  });
+              } else {
+                selectProp.innerHTML = '';
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Seleccione propietario';
+                selectProp.appendChild(option);
+              }
+              hiddenId.value = '';
+            }, 350); // TODO: Sacar este "magic number" que representa el debounce a una constante
           });
-          // Si el usuario borra el campo, borra el hidden
-          $('#input-propietario').on('input', function() {
-            if (!$(this).val()) {
-              $('#id-propietario-hidden').val('');
-            }
+
+          selectProp.addEventListener('change', function () {
+            hiddenId.value = selectProp.value;
           });
         });
       </script>

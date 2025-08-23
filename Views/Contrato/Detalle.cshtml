@@ -1,0 +1,40 @@
+@model inmobiliaria.Models.Contrato
+@{
+    ViewData["Title"] = "Detalle Contrato";
+    Layout = "~/Views/Panel/_Layout.cshtml";
+}
+
+<h1 class="text-center fs-3">DETALLE DE CONTRATO</h1>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-body">
+          <dl class="row">
+            <dt class="col-sm-4">Inquilino</dt>
+            <dd class="col-sm-8">@ViewBag.Inquilino</dd>
+            <dt class="col-sm-4">Inmueble</dt>
+            <dd class="col-sm-8">@ViewBag.Inmueble</dd>
+            <dt class="col-sm-4">Usuario Creador</dt>
+            <dd class="col-sm-8">@ViewBag.UsuarioCreador</dd>
+            <dt class="col-sm-4">Usuario Finalizador</dt>
+            <dd class="col-sm-8">@ViewBag.UsuarioFinalizador</dd>
+            <dt class="col-sm-4">Fecha de Inicio</dt>
+            <dd class="col-sm-8">@Model.FechaInicio.ToShortDateString()</dd>
+            <dt class="col-sm-4">Fecha de Finalización</dt>
+            <dd class="col-sm-8">@Model.FechaFinOriginal.ToShortDateString()</dd>
+            <dt class="col-sm-4">Fecha Fin Anticipada</dt>
+            <dd class="col-sm-8">@(Model.FechaFinAnticipada.HasValue ? Model.FechaFinAnticipada.Value.ToShortDateString() : "-")</dd>
+            <dt class="col-sm-4">Monto Mensual</dt>
+            <dd class="col-sm-8">$@Model.MontoMensual</dd>
+            <dt class="col-sm-4">Estado</dt>
+            <dd class="col-sm-8">@Model.Estado</dd>
+            <dt class="col-sm-4">Multa</dt>
+            <dd class="col-sm-8">@(Model.Multa.HasValue ? "$" + Model.Multa.Value.ToString() : "-")</dd>
+          </dl>
+        </div>
+      </div>
+      <a href="/panel/contratos" class="btn btn-secondary">Volver</a>
+    </div>
+  </div>
+</div>

@@ -24,6 +24,16 @@ namespace inmobiliaria.Controllers
       return View(inmuebles);
     }
 
+    // GET: /panel/inmuebles/obtener-precio/{id}
+    [HttpGet("obtener-precio/{id}")]
+    public IActionResult ObtenerPrecio(int id)
+    {
+      var inmueble = _inmuebleDao.ObtenerPorId(id);
+      if (inmueble == null)
+        return NotFound();
+      return Json(new { precio = inmueble.Precio });
+    }
+
     // GET: /panel/inmuebles/crear
     [HttpGet("crear")]
     public IActionResult Crear()

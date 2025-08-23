@@ -74,6 +74,19 @@ app.MapControllerRoute(
     defaults: new { controller = "Panel", action = "Inquilinos" })
     .WithStaticAssets();
 
+// Rutas personalizadas para contratos
+app.MapControllerRoute(
+    name: "panel_contratos_detalle",
+    pattern: "panel/contratos/detalle/{id}",
+    defaults: new { controller = "Contrato", action = "Detalle" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "panel_contratos_lista",
+    pattern: "panel/contratos",
+    defaults: new { controller = "Panel", action = "Contratos" })
+    .WithStaticAssets();
+
 // Rutas personalizadas para tipos de inmueble
 app.MapControllerRoute(
     name: "panel_tipos_inmueble_detalle",
@@ -85,12 +98,6 @@ app.MapControllerRoute(
     name: "panel_tipos_inmueble_lista",
     pattern: "panel/tipos-inmueble",
     defaults: new { controller = "Panel", action = "TiposInmueble" })
-    .WithStaticAssets();
-
-app.MapControllerRoute(
-    name: "panel_inmuebles_lista",
-    pattern: "panel/inmuebles",
-    defaults: new { controller = "Panel", action = "Inquilinos" })
     .WithStaticAssets();
 
 // Ruta para el panel principal

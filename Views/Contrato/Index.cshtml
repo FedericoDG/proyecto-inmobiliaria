@@ -1,0 +1,113 @@
+@model IEnumerable<inmobiliaria.Models.Contrato>
+@{
+    ViewData["Title"] = "Lista de Contratos";
+    Layout = "~/Views/Panel/_Layout.cshtml";
+}
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+        @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+<h1 class="text-center fs-3">CONTRATOS</h1>
+<div class="d-flex justify-content-end mb-2">
+  <a class="btn btn-primary" href="/panel/contratos/crear">Nuevo contrato</a>
+</div>
+<table class="table table-striped">
+  <thead>
+      <tr>
+          <th>ID</th>
+          <th>Inquilino</th>
+          <th>Inmueble</th>
+          <th>Fecha Inicio</th>
+          <th>Fecha Fin Original</th>
+          <th>Monto Mensual</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+      </tr>
+  </thead>
+  <tbody>
+      @foreach (var c in Model)
+      {
+          <tr>
+              <td>@c.IdContrato</td>
+              <td>
+                @{
+                  var inq = ((IEnumerable<dynamic>)ViewBag.Inquilinos)?.FirstOrDefault(i => i.IdInquilino == c.IdInquilino);
+                }
+                @(inq != null ? inq.Nombre + " " + inq.Apellido + " (" + inq.Dni + ")" : "-")
+              </td>
+              <td>
+                @{
+                  var inm = ((IEnumerable<dynamic>)ViewBag.Inmuebles)?.FirstOrDefault(i => i.IdInmueble == c.IdInmueble);
+                }
+                @(inm != null ? inm.Direccion : "-")
+              </td>
+              <td>@c.FechaInicio.ToShortDateString()</td>
+              <td>@c.FechaFinOriginal.ToShortDateString()</td>
+              <td>@c.MontoMensual</td>
+              <td>@c.Estado</td>
+        <td>
+          <a class="btn btn-outline-info btn-sm" href="/panel/contratos/detalle/@c.IdContrato">Detalle</a>
+          <a class="btn btn-outline-primary btn-sm" href="/panel/contratos/editar/@c.IdContrato">Editar</a>
+          <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar" data-id="@c.IdContrato" data-nombre="@c.IdContrato">Eliminar</button>
+        </td>
+          </tr>
+      }
+  </tbody>
+</table>
+
+<nav aria-label="Paginación">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(ViewBag.Page <= 1 ? "disabled" : "")">
+        <a class="page-link" href="?page=@(ViewBag.Page - 1)&pageSize=@ViewBag.PageSize">Anterior</a>
+        </li>
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <li class="page-item @(i == ViewBag.Page ? "active" : "")">
+                <a class="page-link" href="?page=@i&pageSize=@ViewBag.PageSize">@i</a>
+            </li>
+        }
+        <li class="page-item @(ViewBag.Page >= ViewBag.TotalPages ? "disabled" : "")">
+        <a class="page-link" href="?page=@(ViewBag.Page + 1)&pageSize=@ViewBag.PageSize">Siguiente</a>
+        </li>
+    </ul>
+</nav>
+
+<!-- Modal de confirmación de borrado -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEliminarLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro que deseas eliminar el contrato <span id="nombreContrato"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="formEliminar" method="post">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+  const modalEliminar = document.getElementById('modalEliminar');
+  modalEliminar.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const id = button.getAttribute('data-id');
+    const nombre = button.getAttribute('data-nombre');
+    document.getElementById('nombreContrato').textContent = nombre;
+    const form = document.getElementById('formEliminar');
+    form.action = '/panel/contratos/eliminar/' + id;
+  });
+</script>
+}

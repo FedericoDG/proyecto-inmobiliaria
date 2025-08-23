@@ -19,7 +19,7 @@ namespace inmobiliaria.Models
 
         [Required(ErrorMessage = "El uso es obligatorio")]
         [Column("uso")]
-        public string Uso { get; set; } = string.Empty; // Enum: residencial, comercial
+        public string Uso { get; set; } = string.Empty; // Esto es un Enum: residencial, comercial
 
         [Required(ErrorMessage = "La dirección es obligatoria")]
         [StringLength(255)]
@@ -38,7 +38,7 @@ namespace inmobiliaria.Models
         public decimal? Precio { get; set; }
 
         [Column("estado")]
-        public string? Estado { get; set; } // Enum: disponible, suspendido, ocupado
+        public string? Estado { get; set; } // Esto es un Enum: disponible, suspendido, ocupado
 
         [Column("activo")]
         public bool Activo { get; set; } = true;

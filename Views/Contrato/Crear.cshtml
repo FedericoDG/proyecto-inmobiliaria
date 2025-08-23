@@ -1,0 +1,108 @@
+@model inmobiliaria.Models.Contrato
+@{
+    ViewData["Title"] = "Crear Contrato";
+    Layout = "~/Views/Panel/_Layout.cshtml";
+}
+
+<h1 class="text-center fs-3">NUEVO CONTRATO</h1>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <form asp-action="Crear" method="post">
+        <div class="form-group mb-3">
+          <label for="input-inquilino">Inquilino</label>
+          <input type="text" class="form-control" placeholder="Inquilino" id="input-inquilino" autocomplete="off" />
+          <input type="hidden" name="IdInquilino" id="id-inquilino-hidden" />
+          <span asp-validation-for="IdInquilino" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-3">
+          <label for="input-inmueble">Inmueble</label>
+          <input type="text" class="form-control" placeholder="Inmueble" id="input-inmueble" autocomplete="off" />
+          <input type="hidden" name="IdInmueble" id="id-inmueble-hidden" />
+          <span asp-validation-for="IdInmueble" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="IdUsuarioCreador" class="form-label">Usuario Creador</label>
+            <input type="text" class="form-control" value="@User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value @User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value (@User.Identity?.Name)" readonly />
+            <input type="hidden" asp-for="IdUsuarioCreador" value="@User.FindFirst("Id")?.Value" />
+            <span asp-validation-for="IdUsuarioCreador" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
+          <input asp-for="FechaInicio" class="form-control" type="date" oninvalid="this.setCustomValidity('El campo Fecha de Inicio es obligatorio')" oninput="setCustomValidity('')" required />
+          <span asp-validation-for="FechaInicio" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="FechaFinOriginal" class="form-label">Fecha de Finalización</label>
+          <input asp-for="FechaFinOriginal" class="form-control" type="date" oninvalid="this.setCustomValidity('El campo Fecha de Finalización es obligatorio')" oninput="setCustomValidity('')" required />
+          <span asp-validation-for="FechaFinOriginal" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="MontoMensual" class="form-label">Monto Mensual</label>
+          <input asp-for="MontoMensual" class="form-control" id="MontoMensual" value="@(ViewBag.MontoSugerido ?? "")" />
+          <span asp-validation-for="MontoMensual" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Crear</button>
+        <a href="/panel/contratos" class="btn btn-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <script>
+    $(function () {
+      var inquilinos = [
+        @foreach (var i in ViewBag.Inquilinos)
+        {
+          @: { label: "@Html.Raw(i.Nombre.Replace("\"", "\\\"") + " " + i.Apellido.Replace("\"", "\\\"") + " (" + i.Dni + ")")", value: "@i.IdInquilino" },
+        }
+      ];
+      $("#input-inquilino").autocomplete({
+        source: inquilinos,
+        minLength: 1,
+        select: function (event, ui) {
+          $(this).val(ui.item.label);
+          $('#id-inquilino-hidden').val(ui.item.value);
+          return false;
+        }
+      });
+      $('#input-inquilino').on('input', function() {
+        if (!$(this).val()) {
+          $('#id-inquilino-hidden').val('');
+        }
+      });
+
+      var inmuebles = [
+        @foreach (var inm in ViewBag.Inmuebles)
+        {
+        @: { label: "@Html.Raw(inm.Direccion + " (" + inm.TipoNombre + ")")", value: "@inm.IdInmueble" },
+        }
+      ];
+      $("#input-inmueble").autocomplete({
+        source: inmuebles,
+        minLength: 1,
+        select: function (event, ui) {
+          $(this).val(ui.item.label);
+          $('#id-inmueble-hidden').val(ui.item.value);
+          // Obtener el precio
+          $.get(`/panel/inmuebles/obtener-precio/${ui.item.value}`, function (data) {
+            console.log(data);
+            if (data && data.precio !== undefined) {
+              $('#MontoMensual').val(data.precio);
+            }
+          });
+          return false;
+        }
+      });
+      $('#input-inmueble').on('input', function() {
+        if (!$(this).val()) {
+          $('#id-inmueble-hidden').val('');
+          $('#MontoMensual').val('');
+        }
+      });
+    });
+  </script>
+}

@@ -9,35 +9,35 @@ namespace inmobiliaria.Models
         [Column("id_contrato")]
         public int IdContrato { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El inquilino es obligatorio")]
         [Column("id_inquilino")]
-        public int IdInquilino { get; set; }
+        public int? IdInquilino { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El inmueble es obligatorio")]
         [Column("id_inmueble")]
-        public int IdInmueble { get; set; }
+        public int? IdInmueble { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El usuario creador es obligatorio")]
         [Column("id_usuario_creador")]
         public int IdUsuarioCreador { get; set; }
 
         [Column("id_usuario_finalizador")]
         public int? IdUsuarioFinalizador { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "La fecha de inicio es obligatoria")]
         [Column("fecha_inicio")]
         public DateTime FechaInicio { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "La fecha de finalización original es obligatoria")]
         [Column("fecha_fin_original")]
         public DateTime FechaFinOriginal { get; set; }
 
         [Column("fecha_fin_anticipada")]
         public DateTime? FechaFinAnticipada { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El monto mensual es obligatorio")]
         [Column("monto_mensual")]
-        public decimal MontoMensual { get; set; }
+        public decimal? MontoMensual { get; set; }
 
         [Column("estado")]
         public string? Estado { get; set; } // Enum: vigente, finalizado, rescindido

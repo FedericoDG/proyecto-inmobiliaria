@@ -1,0 +1,87 @@
+@model inmobiliaria.Models.Contrato
+@{
+    ViewData["Title"] = "Editar Contrato";
+    Layout = "~/Views/Panel/_Layout.cshtml";
+}
+
+<h1 class="text-center fs-3">EDITAR CONTRATO</h1>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <form asp-action="Editar" method="post">
+        <input type="hidden" asp-for="IdContrato" />
+        <div class="mb-3">
+          <label asp-for="IdInquilino" class="form-label">Inquilino</label>
+          <select asp-for="IdInquilino" class="form-select" disabled>
+            <option value="">Seleccione inquilino</option>
+            @foreach (var i in ViewBag.Inquilinos)
+            {
+              <option value="@i.IdInquilino" selected="@(i.IdInquilino == Model.IdInquilino ? "selected" : null)">
+            @i.Nombre @i.Apellido (@i.Dni)
+              </option>
+            }
+          </select>
+          <input type="hidden" asp-for="IdInquilino" />
+          <span asp-validation-for="IdInquilino" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="IdInmueble" class="form-label"></label>
+          <input type="hidden" asp-for="IdInmueble" value="@Model.IdInmueble" />
+          <select asp-for="IdInmueble" class="form-select" disabled>
+            <option value="">Seleccione inmueble</option>
+            @foreach (var inm in ViewBag.Inmuebles)
+            {
+                <option value="@inm.IdInmueble" selected="@(inm.IdInmueble == Model.IdInmueble ? "selected" : null)">
+                    @inm.Direccion
+                </option>
+            }
+          </select>
+          <span asp-validation-for="IdInmueble" class="text-danger"></span>
+        </div>
+          <div class="mb-3">
+            <label asp-for="IdUsuarioCreador" class="form-label">Usuario Creador</label>
+            <input type="text" class="form-control" value="@User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value @User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value (@User.Identity?.Name)" readonly />
+            <input type="hidden" asp-for="IdUsuarioCreador" value="@User.FindFirst("Id")?.Value" />
+            <span asp-validation-for="IdUsuarioCreador" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
+          <input asp-for="FechaInicio" class="form-control" type="date" readonly/>
+          <span asp-validation-for="FechaInicio" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="FechaFinOriginal" class="form-label">Fecha de Finzalización</label>
+          <input asp-for="FechaFinOriginal" class="form-control" type="date" readonly/>
+          <span asp-validation-for="FechaFinOriginal" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="FechaFinAnticipada" class="form-label">Fecha de Finalización Anticipada</label>
+          <input asp-for="FechaFinAnticipada" class="form-control" type="date" />
+          <span asp-validation-for="FechaFinAnticipada" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="MontoMensual" class="form-label">Monto Mensual</label>
+          <input asp-for="MontoMensual" class="form-control" />
+          <span asp-validation-for="MontoMensual" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="Estado" class="form-label"></label>
+          <select asp-for="Estado" class="form-select">
+            <option value="">Seleccione estado</option>
+            <option value="vigente" selected="@(Model.Estado == "vigente" ? "selected" : null)">Vigente</option>
+            <option value="finalizado" selected="@(Model.Estado == "finalizado" ? "selected" : null)">Finalizado</option>
+            <option value="rescindido" selected="@(Model.Estado == "rescindido" ? "selected" : null)">Rescindido</option>
+          </select>
+          <span asp-validation-for="Estado" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="Multa" class="form-label"></label>
+          <input asp-for="Multa" class="form-control" />
+          <span asp-validation-for="Multa" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="/panel/contratos" class="btn btn-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>

@@ -90,6 +90,28 @@ namespace inmobiliaria.Repositories
             return cmd.ExecuteNonQuery() > 0;
         }
 
+        public bool ActualizarContrasena(int idUsuario, string nuevaContrasena)
+        {
+            using var conn = Conexion.ObtenerConexion(_connectionString);
+            var hasher = new PasswordHasher<Usuario>();
+            var usuario = ObtenerPorId(idUsuario);
+            if (usuario == null) return false;
+            var hash = hasher.HashPassword(usuario, nuevaContrasena);
+            var cmd = new MySqlCommand("UPDATE usuarios SET contrasena = @contrasena WHERE id_usuario = @id", conn);
+            cmd.Parameters.AddWithValue("@id", idUsuario);
+            cmd.Parameters.AddWithValue("@contrasena", hash);
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+        public bool ActualizarAvatar(int idUsuario, string? avatarUrl)
+        {
+            using var conn = Conexion.ObtenerConexion(_connectionString);
+            var cmd = new MySqlCommand("UPDATE usuarios SET avatar = @avatar WHERE id_usuario = @id", conn);
+            cmd.Parameters.AddWithValue("@id", idUsuario);
+            cmd.Parameters.AddWithValue("@avatar", avatarUrl ?? (object)DBNull.Value);
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
         public bool EliminarUsuario(int id)
         {
             using var conn = Conexion.ObtenerConexion(_connectionString);

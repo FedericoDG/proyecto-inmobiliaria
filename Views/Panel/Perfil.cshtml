@@ -1,0 +1,68 @@
+@model inmobiliaria.Models.Usuario
+@{
+  ViewData["Title"] = "Mi Perfil";
+  Layout = "~/Views/Panel/_Layout.cshtml";
+}
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+          <i class="bi bi-person-circle fs-4 me-2"></i>
+          <span class="fs-5">Mi Perfil</span>
+        </div>
+        <div class="card-body p-4">
+          <form asp-action="Perfil" method="post" enctype="multipart/form-data" autocomplete="off">
+            <div class="mb-3 text-center">
+              @{
+                var nombre = Model.Nombre ?? "Usuario";
+                var apellido = Model.Apellido ?? "";
+                var nombreApellido = $"{nombre} {apellido}".Trim();
+                var avatarUrl = !string.IsNullOrEmpty(Model.Avatar)
+                ? Model.Avatar
+                : $"https://ui-avatars.com/api/?name={nombreApellido}&background=0D8ABC&color=fff&size=100";
+              }
+              <img src="@avatarUrl" alt="Avatar" class="rounded-circle shadow" style="width: 100px; height: 100px;">
+            </div>
+            <div class="mb-3">
+              <label asp-for="Avatar" class="form-label">Actualizar Avatar</label>
+              <input type="file" name="AvatarFile" class="form-control" accept="image/*" />
+            </div>
+            <div class="mb-3">
+              <label asp-for="Email" class="form-label">Email</label>
+              <input asp-for="Email" class="form-control" readonly />
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label asp-for="Nombre" class="form-label">Nombre</label>
+                <input asp-for="Nombre" class="form-control" readonly />
+              </div>
+              <div class="col-md-6">
+                <label asp-for="Apellido" class="form-label">Apellido</label>
+                <input asp-for="Apellido" class="form-control" readonly />
+              </div>
+            </div>
+            <div class="row g-3 mt-2">
+              <div class="col-md-6">
+                <label for="NuevaContrasena" class="form-label">Nueva Contraseña</label>
+                <input type="password" name="NuevaContrasena" id="NuevaContrasena" class="form-control"
+                  autocomplete="new-password" />
+              </div>
+              <div class="col-md-6">
+                <label for="ConfirmarContrasena" class="form-label">Confirmar Contraseña</label>
+                <input type="password" name="ConfirmarContrasena" id="ConfirmarContrasena" class="form-control"
+                  autocomplete="new-password" />
+              </div>
+            </div>
+            <div class="d-grid gap-2 mt-3">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save me-1"></i> Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+
+@section Scripts {
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+}

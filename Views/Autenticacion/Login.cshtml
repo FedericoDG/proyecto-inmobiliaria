@@ -5,61 +5,81 @@
   ViewData["Title"] = "Acceso";
 }
 
-<h1 class="text-center fs-3">ACCESO</h1>
-
-@if (ViewBag.Mensaje != null)
-{
-  <div class="alert alert-danger">@ViewBag.Mensaje</div>
-}
-
-<div class="container">
+<div class="container py-4">
   <div class="row justify-content-center">
-    <div class="col-md-6">
-      <form method="post">
-      <div class="mb-3">
-        <label for="email" class="form-label">Correo electrónico:</label>
-        <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+          <i class="bi bi-person-circle fs-3 me-2"></i>
+          <span class="fs-4">Acceso al sistema</span>
+        </div>
+        <div class="card-body">
+          @if (ViewBag.Mensaje != null)
+          {
+            <div class="alert alert-danger">@ViewBag.Mensaje</div>
+          }
+          <form method="post" autocomplete="off">
+            <div class="mb-3">
+              <label for="email" class="form-label">Correo electrónico</label>
+              <input type="email" class="form-control" id="email" name="email" autocomplete="username" required>
+            </div>
+            <div class="mb-3">
+              <label for="contrasena" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" id="contrasena" name="contrasena"
+                autocomplete="current-password" required>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Ingresar
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-      <div class="mb-3">
-        <label for="contrasena" class="form-label">Contraseña:</label>
-        <input type="password" class="form-control" id="contrasena" name="contrasena">
-      </div>
-      <button type="submit" class="btn btn-primary">INGRESAR</button>
-      </form>
     </div>
   </div>
 </div>
 
 
 <!-- Credenciales de prueba -->
-<div class="">
-  <table class="table table-sm table-bordered mt-2 mb-0">
-    <thead>
-      <tr>
-        <th>Correo electrónico</th>
-        <th>Contraseña</th>
-        <th>Rol</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>administrador@mail.com</td>
-        <td>1234</td>
-        <td>Administrador</td>
-      </tr>
-      <tr>
-        <td>usuario1@mail.com</td>
-        <td>1234</td>
-        <td>Usuario</td>
-      </tr>
-      <tr>
-        <td>usuario2@mail.com</td>
-        <td>1234</td>
-        <td>Usuario</td>
-      </tr>
-
-    </tbody>
-  </table>
-  <small>Utiliza estas credenciales de prueba para acceder.</small>
+<div class="container mt-3">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-secondary text-white d-flex align-items-center">
+          <i class="bi bi-info-circle me-2"></i>
+          <span class="fw-semibold">Credenciales de prueba</span>
+        </div>
+        <div class="card-body p-2">
+          <table class="table table-sm table-bordered mb-0">
+            <thead>
+              <tr>
+                <th>Correo electrónico</th>
+                <th>Contraseña</th>
+                <th>Rol</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>administrador@mail.com</td>
+                <td>1234</td>
+                <td>Administrador</td>
+              </tr>
+              <tr>
+                <td>usuario1@mail.com</td>
+                <td>1234</td>
+                <td>Usuario</td>
+              </tr>
+              <tr>
+                <td>usuario2@mail.com</td>
+                <td>1234</td>
+                <td>Usuario</td>
+              </tr>
+            </tbody>
+          </table>
+          <small class="text-muted">Utiliza estas credenciales de prueba para acceder.</small>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-

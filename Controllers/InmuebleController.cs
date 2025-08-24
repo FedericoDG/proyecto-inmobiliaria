@@ -13,14 +13,18 @@ namespace inmobiliaria.Controllers
 
     // GET: /panel/inmuebles
     [HttpGet("")]
-    public IActionResult Index()
+    public IActionResult Index(int page = 1, int pageSize = 2)
     {
-      var inmuebles = _inmuebleDao.ObtenerTodos();
+      var inmuebles = _inmuebleDao.ObtenerPaginados(page, pageSize);
       var propietarios = _propietarioDao.ObtenerTodos();
       var tipos = _tipoInmuebleDao.ObtenerTodos();
+      int total = _inmuebleDao.ContarInmuebles();
+      int totalPages = (int)Math.Ceiling((double)total / pageSize);
       ViewBag.Propietarios = propietarios;
       ViewBag.TiposInmueble = tipos;
-
+      ViewBag.Page = page;
+      ViewBag.PageSize = pageSize;
+      ViewBag.TotalPages = totalPages;
       return View(inmuebles);
     }
 

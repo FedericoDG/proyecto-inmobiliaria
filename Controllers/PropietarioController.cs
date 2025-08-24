@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using inmobiliaria.Models;
 using inmobiliaria.Repositories;
+using inmobiliaria.Config;
 
 namespace inmobiliaria.Controllers
 {
@@ -11,7 +12,7 @@ namespace inmobiliaria.Controllers
 
     // GET: /panel/propietarios?page=1&pageSize=10
     [HttpGet("")]
-    public IActionResult Index(int page = 1, int pageSize = 2)
+    public IActionResult Index(int page = 1, int pageSize = PaginacionConfig.PageSizeDefault)
     {
       var total = _propietarioDao.ContarPropietarios();
       var propietarios = _propietarioDao.ObtenerPaginados(page, pageSize);

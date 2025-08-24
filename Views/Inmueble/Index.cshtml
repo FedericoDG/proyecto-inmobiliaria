@@ -22,31 +22,44 @@
 
 
 
-<h1 class="text-center fs-3">INMUEBLES</h1>
 
-<div class="d-flex justify-content-end mb-2">
-  <a class="btn btn-primary" href="/panel/inmuebles/crear">Nuevo inmueble</a>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 bg-primary text-white">
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <h1 class="card-title mb-0 fs-3">
+                        <i class="bi bi-house-door-fill me-2"></i>Inmuebles
+                    </h1>
+                    <small class="text-white-50">Listado de todos los inmuebles registrados</small>
+                </div>
+                <a class="btn btn-light btn-lg" href="/panel/inmuebles/crear">
+                    <i class="bi bi-plus-square-fill me-1"></i> Nuevo inmueble
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <table class="table table-striped">
-  <thead>
-      <tr>
-          <th>ID</th>
-          <th>Propietario</th>
-          <th>Tipo</th>
-          <th>Uso</th>
-          <th>Dirección</th>
-          <th>Ambientes</th>
-          <th>Coordenadas</th>
-          <th>Precio</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-      </tr>
-  </thead>
-  <tbody>
-      @foreach (var inm in Model)
-      {
-          <tr>
+    <thead>
+        <tr class="table-primary">
+            <th>ID</th>
+            <th>Propietario</th>
+            <th>Tipo</th>
+            <th>Uso</th>
+            <th>Dirección</th>
+            <th>Ambientes</th>
+            <th>Coordenadas</th>
+            <th>Precio</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var inm in Model)
+        {
+            <tr>
                 <td>@inm.IdInmueble</td>
                 <td>
                     @{
@@ -66,9 +79,16 @@
                 <td>@inm.Coordenadas</td>
                 <td>@inm.Precio</td>
                 <td>@inm.Estado</td>
-                <td>
-                    <a class="btn btn-outline-primary btn-sm" href="/panel/inmuebles/editar/@inm.IdInmueble">Editar</a>
-                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar" data-id="@inm.IdInmueble" data-nombre="@inm.Direccion">Eliminar</button>
+                <td class="text-center">
+                    <a class="btn btn-outline-primary btn-sm me-1" href="/panel/inmuebles/editar/@inm.IdInmueble"
+                        title="Editar">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#modalEliminar" data-id="@inm.IdInmueble" data-nombre="@inm.Direccion"
+                        title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </td>
             </tr>
         }
@@ -77,22 +97,22 @@
 </table>
 
 <nav aria-label="Paginación"></nav>
-    <ul class="pagination justify-content-center">
-        <li class="page-item @(ViewBag.Page <= 1 ? "disabled" : "")">
+<ul class="pagination justify-content-center">
+    <li class="page-item @(ViewBag.Page <= 1 ? "disabled" : "")">
         <a class="page-link" href="?page=@(ViewBag.Page - 1)&pageSize=@ViewBag.PageSize">Anterior</a>
+    </li>
+
+    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+    {
+        <li class="page-item @(i == ViewBag.Page ? "active" : "")">
+            <a class="page-link" href="?page=@i&pageSize=@ViewBag.PageSize">@i</a>
         </li>
+    }
 
-        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-        {
-            <li class="page-item @(i == ViewBag.Page ? "active" : "")">
-                <a class="page-link" href="?page=@i&pageSize=@ViewBag.PageSize">@i</a>
-            </li>
-        }
-
-        <li class="page-item @(ViewBag.Page >= ViewBag.TotalPages ? "disabled" : "")">
+    <li class="page-item @(ViewBag.Page >= ViewBag.TotalPages ? "disabled" : "")">
         <a class="page-link" href="?page=@(ViewBag.Page + 1)&pageSize=@ViewBag.PageSize">Siguiente</a>
-        </li>
-    </ul>
+    </li>
+</ul>
 </nav>
 
 <!-- Modal de confirmación de borrado -->
@@ -117,15 +137,16 @@
 </div>
 
 @section Scripts {
-<script>
-  const modalEliminar = document.getElementById('modalEliminar');
-  modalEliminar.addEventListener('show.bs.modal', function (event) {
-    const button = event.relatedTarget;
-    const id = button.getAttribute('data-id');
-    const nombre = button.getAttribute('data-nombre');
-    document.getElementById('nombreInmueble').textContent = nombre;
-    const form = document.getElementById('formEliminar');
-    form.action = '/panel/inmuebles/eliminar/' + id;
-  });
-</script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <script>
+        const modalEliminar = document.getElementById('modalEliminar');
+        modalEliminar.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const nombre = button.getAttribute('data-nombre');
+            document.getElementById('nombreInmueble').textContent = nombre;
+            const form = document.getElementById('formEliminar');
+            form.action = '/panel/inmuebles/eliminar/' + id;
+        });
+    </script>
 }

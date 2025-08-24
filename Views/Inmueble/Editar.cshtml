@@ -19,86 +19,149 @@
     }
 }
 
-<h1 class="text-center fs-3">EDITAR INMUEBLE</h1>
 
-<div class="container">
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <form asp-action="Editar" method="post">
-                <input type="hidden" asp-for="IdInmueble" />
-                <div class="form-group mb-3">
-                    <label for="input-dni-propietario">Buscar propietario por DNI</label>
-                    <input type="text" class="form-control" id="input-dni-propietario" autocomplete="off"
-                        placeholder="Escriba DNI" />
-                    <select class="form-select mt-2" id="select-propietario" size="3">
-                        <option value="@Model.IdPropietario">@propietarioNombre</option>
-                    </select>
-                    <input type="hidden" name="IdPropietario" id="id-propietario-hidden" value="@Model.IdPropietario" />
-                    <span asp-validation-for="IdPropietario" class="text-danger"></span>
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="bi bi-pencil-square fs-4 me-2"></i>
+                    <span class="fs-4">Editar Inmueble</span>
                 </div>
-                <div class="mb-3">
-                    <label asp-for="IdTipo" class="form-label"></label>
-                    <select asp-for="IdTipo" class="form-select">
-                        <option value="">Seleccione tipo de inmueble</option>
-                        @foreach (var t in ViewBag.TiposInmueble)
-                        {
-                            <option value="@t.IdTipo" selected="@(t.IdTipo == Model.IdTipo ? "selected" : null)">@t.Nombre
-                            </option>
-                        }
-                    </select>
-                    <span asp-validation-for="IdTipo" class="text-danger"></span>
+                <div class="card-body">
+                    <form asp-action="Editar" method="post" autocomplete="off">
+                        <input type="hidden" asp-for="IdInmueble" />
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="input-dni-propietario" class="form-label">Buscar propietario por DNI</label>
+                                <input type="text" class="form-control" id="input-dni-propietario" autocomplete="off"
+                                    placeholder="Escriba DNI" />
+                                <select class="form-select mt-2" id="select-propietario" size="3">
+                                    <option value="@Model.IdPropietario">@propietarioNombre</option>
+                                </select>
+                                <input type="hidden" name="IdPropietario" id="id-propietario-hidden"
+                                    value="@Model.IdPropietario" />
+                                <span asp-validation-for="IdPropietario" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="IdTipo" class="form-label">Tipo</label>
+                                <select asp-for="IdTipo" class="form-select">
+                                    <option value="">Seleccione tipo de inmueble</option>
+                                    @foreach (var t in ViewBag.TiposInmueble)
+                                    {
+                                        <option value="@t.IdTipo"
+                                            selected="@(t.IdTipo == Model.IdTipo ? "selected" : null)">@t.Nombre</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="IdTipo" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Uso" class="form-label">Uso</label><br />
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="Uso" id="radio-uso-residencial"
+                                        value="residencial" @(Model.Uso == "residencial" ? "checked" : "") />
+                                    <label class="form-check-label" for="radio-uso-residencial">Residencial</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="Uso" id="radio-uso-comercial"
+                                        value="comercial" @(Model.Uso == "comercial" ? "checked" : "") />
+                                    <label class="form-check-label" for="radio-uso-comercial">Comercial</label>
+                                </div>
+                                <span asp-validation-for="Uso" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Direccion" class="form-label"></label>
+                                <input asp-for="Direccion" class="form-control" placeholder="Ej: Calle Falsa 123" />
+                                <span asp-validation-for="Direccion" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="CantidadAmbientes" class="form-label">Cantidad de Ambientes</label>
+                                <input asp-for="CantidadAmbientes" class="form-control" placeholder="Ej: 3" />
+                                <span asp-validation-for="CantidadAmbientes" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Coordenadas" class="form-label"></label>
+                                <input asp-for="Coordenadas" class="form-control" placeholder="Ej: -34.6037,-58.3816" />
+                                <span asp-validation-for="Coordenadas" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Precio" class="form-label"></label>
+                                <input asp-for="Precio" class="form-control" placeholder="Ej: 100000" />
+                                <span asp-validation-for="Precio" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Estado" class="form-label"></label>
+                                <select asp-for="Estado" class="form-select">
+                                    <option value="disponible">Disponible</option>
+                                    <option value="suspendido">Suspendido</option>
+                                    <option value="ocupado">Ocupado</option>
+                                </select>
+                                <span asp-validation-for="Estado" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check-lg me-1"></i> Guardar
+                            </button>
+                            <a href="/panel/inmuebles" class="btn btn-secondary px-4">
+                                <i class="bi bi-x-lg me-1"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <label asp-for="Uso" class="form-label">Uso</label><br />
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="Uso" id="radio-uso-residencial"
-                            value="residencial" @(Model.Uso == "residencial" ? "checked" : "") />
-                        <label class="form-check-label" for="radio-uso-residencial">Residencial</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="Uso" id="radio-uso-comercial"
-                            value="comercial" @(Model.Uso == "comercial" ? "checked" : "") />
-                        <label class="form-check-label" for="radio-uso-comercial">Comercial</label>
-                    </div>
-                    <span asp-validation-for="Uso" class="text-danger"></span>
-                </div>
-                <div class="mb-3">
-                    <label asp-for="Direccion" class="form-label"></label>
-                    <input asp-for="Direccion" class="form-control" />
-                    <span asp-validation-for="Direccion" class="text-danger"></span>
-                </div>
-                <div class="mb-3">
-                    <label asp-for="CantidadAmbientes" class="form-label"></label>
-                    <input asp-for="CantidadAmbientes" class="form-control" />
-                    <span asp-validation-for="CantidadAmbientes" class="text-danger"></span>
-                </div>
-                <div class="mb-3">
-                    <label asp-for="Coordenadas" class="form-label"></label>
-                    <input asp-for="Coordenadas" class="form-control" />
-                    <span asp-validation-for="Coordenadas" class="text-danger"></span>
-                </div>
-                <div class="mb-3">
-                    <label asp-for="Precio" class="form-label"></label>
-                    <input asp-for="Precio" class="form-control" />
-                    <span asp-validation-for="Precio" class="text-danger"></span>
-                </div>
-                <div class="mb-3">
-                    <label asp-for="Estado" class="form-label"></label>
-                    <select asp-for="Estado" class="form-select">
-                        <option value="disponible">Disponible</option>
-                        <option value="suspendido">Suspendido</option>
-                        <option value="ocupado">Ocupado</option>
-                    </select>
-                    <span asp-validation-for="Estado" class="text-danger"></span>
-                </div>
-                <button type="submit" class="btn btn-primary">Guardar</button>
-                <a href="/panel/inmuebles" class="btn btn-secondary">Cancelar</a>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const inputDni = document.getElementById('input-dni-propietario');
+            const selectProp = document.getElementById('select-propietario');
+            const hiddenId = document.getElementById('id-propietario-hidden');
+            let debounceTimeout;
+
+            inputDni.addEventListener('input', function () {
+                const dni = inputDni.value;
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => {
+                    if (dni.length >= 3) {
+                        fetch(`/panel/propietarios/buscar-por-dni?dni=${encodeURIComponent(dni)}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                selectProp.innerHTML = '';
+                                if (data.length === 0) {
+                                    const option = document.createElement('option');
+                                    option.value = '';
+                                    option.textContent = 'No se encontraron propietarios';
+                                    selectProp.appendChild(option);
+                                } else {
+                                    data.forEach(p => {
+                                        const option = document.createElement('option');
+                                        option.value = p.idPropietario;
+                                        option.textContent = `${p.nombre} ${p.apellido} (${p.dni})`;
+                                        selectProp.appendChild(option);
+                                    });
+                                }
+                            });
+                    } else {
+                        selectProp.innerHTML = '';
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'Seleccione propietario';
+                        selectProp.appendChild(option);
+                    }
+                    hiddenId.value = '';
+                }, 350);
+            });
+
+            selectProp.addEventListener('change', function () {
+                hiddenId.value = selectProp.value;
+            });
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const inputDni = document.getElementById('input-dni-propietario');

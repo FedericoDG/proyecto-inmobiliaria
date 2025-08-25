@@ -16,6 +16,7 @@
         <div class="card-body">
           <form asp-action="Editar" method="post" autocomplete="off">
             <input type="hidden" asp-for="IdContrato" />
+            <input type="hidden" asp-for="IdUsuarioCreador" />
             <div class="row g-3">
               <div class="col-md-6">
                 <label asp-for="IdInquilino" class="form-label">Inquilino</label>

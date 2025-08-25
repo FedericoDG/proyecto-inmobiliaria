@@ -119,7 +119,6 @@ namespace inmobiliaria.Controllers
       if (ModelState.IsValid)
       {
         contrato.IdContrato = id;
-        System.Console.WriteLine($"Contrato: {contrato}");
         _contratoDao.ActualizarContrato(contrato);
         TempData["Mensaje"] = "Contrato editado correctamente.";
         return RedirectToAction("Index");

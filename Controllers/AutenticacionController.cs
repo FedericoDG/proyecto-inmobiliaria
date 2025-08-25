@@ -28,13 +28,14 @@ namespace inmobiliaria.Controllers
       if (usuario != null)
       {
         var claims = new List<Claim>
-                {
-                    new(ClaimTypes.Name, usuario.Email),
-                    new(ClaimTypes.Role, usuario.Rol),
-                    new("Id", usuario.IdUsuario.ToString()),
-                    new(ClaimTypes.GivenName, usuario.Nombre),
-                    new(ClaimTypes.Surname, usuario.Apellido)
-                };
+        {
+          new(ClaimTypes.Name, usuario.Email),
+          new(ClaimTypes.Role, usuario.Rol),
+          new("Id", usuario.IdUsuario.ToString()),
+          new(ClaimTypes.GivenName, usuario.Nombre),
+          new(ClaimTypes.Surname, usuario.Apellido),
+          new("Avatar", usuario.Avatar ?? "")
+        };
         var claimsIdentity = new ClaimsIdentity(claims, "authCookie");
         await HttpContext.SignInAsync("authCookie", new ClaimsPrincipal(claimsIdentity));
 

@@ -1,6 +1,65 @@
 @{
     ViewData["Title"] = "Panel principal";
+    Layout = "~/Views/Panel/_Layout.cshtml";
 }
 
-<h2>Panel principal</h2>
-<p>Bienvenido al panel de administración.</p>
+<div class="container py-4">
+    <h2 class="mb-4 text-center fw-bold">PANEL PRINCIPAL</h2>
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-4 col-lg-3">
+            <a href="/panel/propietarios" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 text-center">
+                    <div class="card-body py-4">
+                        <i class="bi bi-person-badge fs-1 text-primary mb-2"></i>
+                        <h5 class="card-title">Propietarios</h5>
+                        <p class="card-text text-muted">Gestión de propietarios</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="/panel/inquilinos" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 text-center">
+                    <div class="card-body py-4">
+                        <i class="bi bi-person-lines-fill fs-1 text-primary mb-2"></i>
+                        <h5 class="card-title">Inquilinos</h5>
+                        <p class="card-text text-muted">Gestión de inquilinos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="/panel/inmuebles" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 text-center">
+                    <div class="card-body py-4">
+                        <i class="bi bi-house-door fs-1 text-primary mb-2"></i>
+                        <h5 class="card-title">Inmuebles</h5>
+                        <p class="card-text text-muted">Gestión de inmuebles</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="/panel/tipos-inmueble" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 text-center">
+                    <div class="card-body py-4">
+                        <i class="bi bi-building-add fs-1 text-primary mb-2"></i>
+                        <h5 class="card-title">Tipos de Inmueble</h5>
+                        <p class="card-text text-muted">Gestión de tipos de inmueble</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="/panel/contratos" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 text-center">
+                    <div class="card-body py-4">
+                        <i class="bi bi-file-earmark-text fs-1 text-primary mb-2"></i>
+                        <h5 class="card-title">Contratos</h5>
+                        <p class="card-text text-muted">Gestión de contratos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>

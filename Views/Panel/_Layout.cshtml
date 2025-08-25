@@ -117,7 +117,10 @@
               var nombre = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? "Usuario";
               var apellido = User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value ?? "";
               var nombreApellido = $"{nombre} {apellido}".Trim();
-              var avatarUrl = $"https://ui-avatars.com/api/?name={nombreApellido}&background=0D8ABC&color=fff&size=32";
+              var avatarClaim = User.FindFirst("Avatar")?.Value;
+              var avatarUrl = !string.IsNullOrEmpty(avatarClaim)
+              ? avatarClaim
+              : $"https://ui-avatars.com/api/?name={nombreApellido}&background=0D8ABC&color=fff&size=32";
             }
             <a href="#" class="d-flex align-items-center link-light text-decoration-none dropdown-toggle"
               id="avatarDropdown" data-bs-toggle="dropdown" aria-expanded="false">

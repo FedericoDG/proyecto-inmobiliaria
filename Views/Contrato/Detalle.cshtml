@@ -23,9 +23,9 @@
 </div>
 
 <div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow-sm border-0 mb-4">
+  <div class="row justify-content-center p-4">
+    <div class="col-lg-5 mb-4">
+      <div class="card shadow-sm border-0 h-100">
         <div class="card-body">
           <dl class="row mb-0">
             <dt class="col-sm-4">Inquilino</dt>
@@ -51,6 +51,105 @@
             <dd class="col-sm-8">@(Model.Multa.HasValue ? "$" + Model.Multa.Value.ToString() : "-")</dd>
           </dl>
         </div>
+      </div>
+    </div>
+    <div class="col-lg-7 mb-4">
+      @if (ViewBag.Pagos != null && ((IEnumerable<inmobiliaria.Models.Pago>)ViewBag.Pagos).Any())
+      {
+        <div class="card shadow-sm border-0 h-100 p-1">
+          <div class="card-header bg-primary text-white">
+            <i class="bi bi-cash-coin me-2"></i>Pagos asociados a este contrato
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-primary">
+                  <tr>
+                    <th>Número</th>
+                    <th>Fecha</th>
+                    <th>Detalle</th>
+                    <th>Importe</th>
+                    <th>Estado</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach (var pago in (IEnumerable<inmobiliaria.Models.Pago>)ViewBag.Pagos)
+                  {
+                    <tr>
+                      <td>@pago.NumeroPago</td>
+                      <td>@pago.FechaPago.ToShortDateString()</td>
+                      <td>@pago.Detalle</td>
+                      <td>$@pago.Importe</td>
+                      <td>@pago.Estado</td>
+                      <td class="text-center">
+                        @if (pago.Estado != "anulado")
+                        {
+                          <form method="post" action="/panel/pagos/anular/@pago.IdPago" style="display:inline">
+                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Anular">
+                              <i class="bi bi-x-circle"></i> Anular
+                            </button>
+                          </form>
+                        }
+                        else
+                        {
+                          <span class="text-danger"></span>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      }
+      @if (Model.Estado == "vigente")
+      {
+        <div class="text-end mt-3">
+          <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#modalNuevoPago">
+            <i class="bi bi-plus-circle me-1"></i> Cargar un nuevo pago
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear nuevo pago -->
+<div class="modal fade" id="modalNuevoPago" tabindex="-1" aria-labelledby="modalNuevoPagoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalNuevoPagoLabel">Cargar un nuevo pago</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formNuevoPago" method="post" action="/panel/pagos/crear">
+          <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="NumeroPago" class="form-label">Número de Pago</label>
+              <input name="NumeroPago" type="number" class="form-control" required />
+            </div>
+            <div class="col-md-6">
+              <label for="FechaPago" class="form-label">Fecha de Pago</label>
+              <input name="FechaPago" type="date" class="form-control" required />
+            </div>
+            <div class="col-md-6">
+              <label for="Importe" class="form-label">Importe</label>
+              <input name="Importe" type="number" step="0.01" class="form-control" required />
+            </div>
+            <div class="col-12">
+              <label for="Detalle" class="form-label">Detalle</label>
+              <textarea name="Detalle" class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary" form="formNuevoPago">Guardar</button>
       </div>
     </div>
   </div>

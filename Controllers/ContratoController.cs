@@ -9,9 +9,13 @@ namespace inmobiliaria.Controllers
   public class ContratoController : Controller
   {
     private readonly ContratoDao _contratoDao;
+    private readonly InmuebleDao _inmuebleDao;
+    private readonly PagoDao _pagoDao;
     public ContratoController(IConfiguration config)
     {
       _contratoDao = new ContratoDao(config.GetConnectionString("MySqlConnection")!);
+      _pagoDao = new PagoDao(config.GetConnectionString("MySqlConnection")!);
+      _inmuebleDao = new InmuebleDao(config.GetConnectionString("MySqlConnection")!);
     }
 
     // GET: /panel/contratos?page=1&pageSize=10
@@ -47,6 +51,11 @@ namespace inmobiliaria.Controllers
       ViewBag.Inmueble = inmueble != null ? $"{inmueble.Direccion} ({inmueble.TipoNombre})" : contrato.IdInmueble.ToString();
       ViewBag.UsuarioCreador = usuarioCreador != null ? $"{usuarioCreador.Nombre} {usuarioCreador.Apellido} ({usuarioCreador.Email})" : contrato.IdUsuarioCreador.ToString();
       ViewBag.UsuarioFinalizador = usuarioFinalizador != null ? $"{usuarioFinalizador.Nombre} {usuarioFinalizador.Apellido} ({usuarioFinalizador.Email})" : "-";
+
+      // Obtener pagos asociados
+      var pagos = _pagoDao.ObtenerTodos().Where(p => p.IdContrato == id).ToList();
+      ViewBag.Pagos = pagos;
+
       return View("Detalle", contrato);
     }
 
@@ -72,14 +81,14 @@ namespace inmobiliaria.Controllers
       if (ModelState.IsValid)
       {
         _contratoDao.CrearContrato(contrato);
+        // Actualizar estado del inmueble a 'ocupado' de forma simple
+        _inmuebleDao.ActualizarEstado((int)contrato.IdInmueble!, "ocupado");
         TempData["Mensaje"] = "Contrato creado correctamente.";
         return RedirectToAction("Index");
       }
 
-      // TODO: Cuando se crea un crontrato el inmueble pasa a ocupado
       ViewBag.Inquilinos = _contratoDao.ObtenerInquilinos();
       ViewBag.Inmuebles = _contratoDao.ObtenerInmuebles();
-      // No cargar usuarios, ya no se selecciona
       return View(contrato);
     }
 
@@ -100,15 +109,22 @@ namespace inmobiliaria.Controllers
     [HttpPost("editar/{id}")]
     public IActionResult Editar(int id, Contrato contrato)
     {
-      if (contrato.Estado != "rescindido")
-      {
-        contrato.FechaFinAnticipada = null;
-      }
-      else
+      if (contrato.Estado == "rescindido")
       {
         // Asignar el usuario logueado como finalizador
         contrato.IdUsuarioFinalizador = int.Parse(User.FindFirst("Id")!.Value);
       }
+      else
+      {
+        contrato.FechaFinAnticipada = null;
+
+      }
+
+      if (contrato.Estado == "rescindido" || contrato.Estado == "finalizado")
+      {
+        _inmuebleDao.ActualizarEstado((int)contrato.IdInmueble!, "disponible");
+      }
+
 
       // Si la fecha de finalización anticipada no es nula, forzar estado a 'rescindido'.
       if (contrato.FechaFinAnticipada != null)
@@ -132,6 +148,11 @@ namespace inmobiliaria.Controllers
     [HttpPost("eliminar/{id}")]
     public IActionResult EliminarConfirmado(int id)
     {
+      var contrato = _contratoDao.ObtenerPorId(id);
+      if (contrato != null && contrato.IdInmueble != null)
+      {
+        _inmuebleDao.ActualizarEstado((int)contrato.IdInmueble, "disponible");
+      }
       _contratoDao.EliminarContrato(id);
       return RedirectToAction("Index");
     }

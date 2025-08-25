@@ -99,7 +99,7 @@ namespace inmobiliaria.Repositories
         {
             var lista = new List<Inmueble>();
             using var conn = Conexion.ObtenerConexion(_connectionString);
-            using var cmd = new MySqlCommand("SELECT * FROM inmuebles WHERE direccion LIKE @direccion AND activo = 1", conn);
+            using var cmd = new MySqlCommand("SELECT * FROM inmuebles WHERE direccion LIKE @direccion AND activo = 1 AND estado = 'disponible'", conn);
             cmd.Parameters.AddWithValue("@direccion", $"%{direccion}%");
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -109,6 +109,17 @@ namespace inmobiliaria.Repositories
             return lista;
         }
 
+        public void ActualizarEstado(int idInmueble, string nuevoEstado)
+        {
+            Console.WriteLine($"ActualizarEstado llamado con idInmueble={idInmueble}, nuevoEstado={nuevoEstado}");
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+            var query = "UPDATE inmuebles SET estado = @estado WHERE id_inmueble = @idInmueble";
+            using var command = new MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@estado", nuevoEstado);
+            command.Parameters.AddWithValue("@idInmueble", idInmueble);
+            command.ExecuteNonQuery();
+        }
 
         private static Inmueble MapearInmueble(IDataRecord reader)
         {

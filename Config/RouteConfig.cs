@@ -69,6 +69,19 @@ namespace inmobiliaria.Config
                 defaults: new { controller = "Panel", action = "TiposInmueble" })
                 .WithStaticAssets();
 
+            // Rutas personalizadas para pagos
+            app.MapControllerRoute(
+                name: "panel_pagos_detalle",
+                pattern: "panel/pagos/detalle/{id}",
+                defaults: new { controller = "Pago", action = "Detalle" })
+                .WithStaticAssets();
+
+            app.MapControllerRoute(
+                name: "panel_pagos_lista",
+                pattern: "panel/pagos",
+                defaults: new { controller = "Pago", action = "Index" })
+                .WithStaticAssets();
+
             // Ruta para el perfil de usuario en el panel
             app.MapControllerRoute(
                 name: "panel_perfil",

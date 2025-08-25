@@ -23,7 +23,7 @@
                 <select class="form-select mt-2" id="select-inquilino" size="3">
                   <option value="">Seleccione inquilino</option>
                 </select>
-                <input type="hidden" name="IdInquilino" id="id-inquilino-hidden" />
+                <input type="hidden" asp-for="IdInquilino" id="id-inquilino-hidden" />
                 <span asp-validation-for="IdInquilino" class="text-danger small"></span>
               </div>
               <div class="col-md-6">
@@ -33,7 +33,7 @@
                 <select class="form-select mt-2" id="select-inmueble" size="3">
                   <option value="">Seleccione inmueble</option>
                 </select>
-                <input type="hidden" name="IdInmueble" id="id-inmueble-hidden" />
+                <input type="hidden" asp-for="IdInmueble" id="id-inmueble-hidden" />
                 <span asp-validation-for="IdInmueble" class="text-danger small"></span>
               </div>
               <div class="col-md-6">
@@ -154,22 +154,22 @@
           hiddenIdInm.value = '';
         }, 350);  // TODO: Sacar este "magic number" que representa el debounce a una constante
       });
-    });
 
-    selectInm.addEventListener('change', function () {
-      hiddenIdInm.value = selectInm.value;
-      // Obtener el precio para ponerlo como "sugerencia"
-      if (selectInm.value) {
-        fetch(`/panel/inmuebles/obtener-precio/${selectInm.value}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data && data.precio !== undefined) {
-              document.getElementById('MontoMensual').value = data.precio;
-            }
-          });
-      } else {
-        document.getElementById('MontoMensual').value = '';
-      }
+      selectInm.addEventListener('change', function () {
+        hiddenIdInm.value = selectInm.value;
+        // Obtener el precio para ponerlo como "sugerencia"
+        if (selectInm.value) {
+          fetch(`/panel/inmuebles/obtener-precio/${selectInm.value}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data && data.precio !== undefined) {
+                document.getElementById('MontoMensual').value = data.precio;
+              }
+            });
+        } else {
+          document.getElementById('MontoMensual').value = '';
+        }
+      });
     });
   </script>
 }

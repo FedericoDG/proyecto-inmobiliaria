@@ -62,6 +62,8 @@ namespace inmobiliaria.Controllers
     [HttpPost("crear")]
     public IActionResult Crear(Contrato contrato)
     {
+      Console.WriteLine($"contrato.IdInquilino: {contrato.IdInquilino}");
+      Console.WriteLine($"contrato.IdInmueble: {contrato.IdInmueble}");
       // Asignar el usuario logueado como creador
       var idUsuario = int.Parse(User.FindFirst("Id")!.Value);
       contrato.IdUsuarioCreador = idUsuario;
@@ -117,6 +119,7 @@ namespace inmobiliaria.Controllers
       if (ModelState.IsValid)
       {
         contrato.IdContrato = id;
+        System.Console.WriteLine($"Contrato: {contrato}");
         _contratoDao.ActualizarContrato(contrato);
         TempData["Mensaje"] = "Contrato editado correctamente.";
         return RedirectToAction("Index");

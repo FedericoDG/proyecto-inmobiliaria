@@ -17,12 +17,12 @@
           <form asp-action="Crear" method="post" autocomplete="off">
             <div class="row g-3">
               <div class="col-md-6">
-                <label asp-for="Dni" class="form-label"></label>
+                <label asp-for="Dni" class="form-label">DNI</label>
                 <input asp-for="Dni" class="form-control" placeholder="Ej: 12345678" />
                 <span asp-validation-for="Dni" class="text-danger small"></span>
               </div>
               <div class="col-md-6">
-                <label asp-for="Telefono" class="form-label"></label>
+                <label asp-for="Telefono" class="form-label">Teléfono</label>
                 <input asp-for="Telefono" class="form-control" placeholder="Ej: 11-1234-5678" />
                 <span asp-validation-for="Telefono" class="text-danger small"></span>
               </div>
@@ -42,7 +42,7 @@
                 <span asp-validation-for="Email" class="text-danger small"></span>
               </div>
               <div class="col-12">
-                <label asp-for="Direccion" class="form-label"></label>
+                <label asp-for="Direccion" class="form-label">Dirección</label>
                 <input asp-for="Direccion" class="form-control" placeholder="Ej: Calle Falsa 123" />
                 <span asp-validation-for="Direccion" class="text-danger small"></span>
               </div>

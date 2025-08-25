@@ -45,11 +45,11 @@
     <thead>
         <tr class="table-primary">
             <th>ID</th>
+            <th>Dirección</th>
             <th>Propietario</th>
             <th>Tipo</th>
-            <th>Uso</th>
-            <th>Dirección</th>
             <th>Ambientes</th>
+            <th>Uso</th>
             <th>Coordenadas</th>
             <th>Precio</th>
             <th>Estado</th>
@@ -61,6 +61,7 @@
         {
             <tr>
                 <td>@inm.IdInmueble</td>
+                <td>@inm.Direccion</td>
                 <td>
                     @{
                         var prop = propietarios?.FirstOrDefault(p => p.IdPropietario == inm.IdPropietario);
@@ -73,9 +74,8 @@
                     }
                     @(tipo != null ? tipo.Nombre : "N/A")
                 </td>
-                <td>@inm.Uso</td>
-                <td>@inm.Direccion</td>
                 <td>@inm.CantidadAmbientes</td>
+                <td>@inm.Uso</td>
                 <td>@inm.Coordenadas</td>
                 <td>@inm.Precio</td>
                 <td>@inm.Estado</td>

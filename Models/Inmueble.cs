@@ -42,5 +42,20 @@ namespace inmobiliaria.Models
 
         [Column("activo")]
         public bool Activo { get; set; } = true;
+
+        public override string ToString()
+        {
+            return $"IdInmueble: {IdInmueble}, " +
+                   $"IdPropietario: {IdPropietario}, " +
+                   $"IdTipo: {IdTipo}, " +
+                   $"Uso: {Uso}, " +
+                   $"Direccion: {Direccion}, " +
+                   $"CantidadAmbientes: {CantidadAmbientes}, " +
+                   $"Coordenadas: {Coordenadas}, " +
+                   $"Precio: {Precio}, " +
+                   $"Estado: {Estado}, " +
+                   $"Activo: {Activo}";
+        }
+
     }
 }

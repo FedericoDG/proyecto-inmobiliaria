@@ -45,5 +45,6 @@ namespace inmobiliaria.Models
 
         [Column("activo")]
         public bool Activo { get; set; }
+
     }
 }

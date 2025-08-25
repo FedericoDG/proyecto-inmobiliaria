@@ -38,5 +38,19 @@ namespace inmobiliaria.Models
 
         [Column("id_usuario_anulador")]
         public int? IdUsuarioAnulador { get; set; }
+
+        public override string ToString()
+        {
+            return $"IdPago: {IdPago}, " +
+                   $"IdContrato: {IdContrato}, " +
+                   $"NumeroPago: {NumeroPago}, " +
+                   $"FechaPago: {FechaPago:yyyy-MM-dd}, " +
+                   $"Detalle: {Detalle}, " +
+                   $"Importe: {Importe}, " +
+                   $"Estado: {Estado}, " +
+                   $"IdUsuarioCreador: {IdUsuarioCreador}, " +
+                   $"IdUsuarioAnulador: {IdUsuarioAnulador}";
+        }
+
     }
 }

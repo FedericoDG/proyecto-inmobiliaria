@@ -44,5 +44,20 @@ namespace inmobiliaria.Models
 
         [Column("multa")]
         public decimal? Multa { get; set; }
+
+        public override string ToString()
+        {
+            return $"IdContrato: {IdContrato}, " +
+                   $"IdInquilino: {IdInquilino}, " +
+                   $"IdInmueble: {IdInmueble}, " +
+                   $"IdUsuarioCreador: {IdUsuarioCreador}, " +
+                   $"IdUsuarioFinalizador: {IdUsuarioFinalizador}, " +
+                   $"FechaInicio: {FechaInicio:yyyy-MM-dd}, " +
+                   $"FechaFinOriginal: {FechaFinOriginal:yyyy-MM-dd}, " +
+                   $"FechaFinAnticipada: {(FechaFinAnticipada.HasValue ? FechaFinAnticipada.Value.ToString("yyyy-MM-dd") : "null")}, " +
+                   $"MontoMensual: {MontoMensual}, " +
+                   $"Estado: {Estado}, " +
+                   $"Multa: {Multa}";
+        }
     }
 }

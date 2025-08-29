@@ -6,13 +6,9 @@ using System.Collections.Generic;
 
 namespace inmobiliaria.Repositories
 {
-  public class ContratoDao
+  public class ContratoDao(string connectionString)
   {
-    private readonly string _connectionString;
-    public ContratoDao(string connectionString)
-    {
-      _connectionString = connectionString;
-    }
+    private readonly string _connectionString = connectionString;
 
     public List<Contrato> ObtenerPaginados(int page, int pageSize)
     {
@@ -84,11 +80,24 @@ namespace inmobiliaria.Repositories
       return cmd.ExecuteNonQuery() > 0;
     }
 
-    public bool EliminarContrato(int id)
+    // public bool EliminarContrato(int id)
+    // {
+    //   using var conn = Conexion.ObtenerConexion(_connectionString);
+    //   var cmd = new MySqlCommand("UPDATE contratos SET estado = 'rescindido' WHERE id_contrato = @id", conn);
+    //   cmd.Parameters.AddWithValue("@id", id);
+    //   return cmd.ExecuteNonQuery() > 0;
+    // }
+
+    public bool RescindirContrato(Contrato contrato)
     {
       using var conn = Conexion.ObtenerConexion(_connectionString);
-      var cmd = new MySqlCommand("UPDATE contratos SET estado = 'rescindido' WHERE id_contrato = @id", conn);
-      cmd.Parameters.AddWithValue("@id", id);
+      var cmd = new MySqlCommand(@"UPDATE contratos SET fecha_fin_anticipada = @fecha_fin_anticipada, monto_mensual = @monto_mensual, multa = @multa, estado = @estado, id_usuario_finalizador = @id_usuario_finalizador WHERE id_contrato = @id_contrato", conn);
+      cmd.Parameters.AddWithValue("@fecha_fin_anticipada", contrato.FechaFinAnticipada);
+      cmd.Parameters.AddWithValue("@monto_mensual", contrato.MontoMensual);
+      cmd.Parameters.AddWithValue("@multa", contrato.Multa ?? (object)DBNull.Value);
+      cmd.Parameters.AddWithValue("@estado", contrato.Estado);
+      cmd.Parameters.AddWithValue("@id_usuario_finalizador", contrato.IdUsuarioFinalizador ?? (object)DBNull.Value);
+      cmd.Parameters.AddWithValue("@id_contrato", contrato.IdContrato);
       return cmd.ExecuteNonQuery() > 0;
     }
 
@@ -110,7 +119,7 @@ namespace inmobiliaria.Repositories
       };
     }
 
-    // Métodos para obtener datos relacionados
+    // Para obtener datos relacionados
     public List<dynamic> ObtenerInquilinos()
     {
       var lista = new List<dynamic>();

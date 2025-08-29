@@ -11,11 +11,13 @@ namespace inmobiliaria.Controllers
     private readonly ContratoDao _contratoDao;
     private readonly InmuebleDao _inmuebleDao;
     private readonly PagoDao _pagoDao;
+    private readonly TipoInmuebleDao _tipoInmuebleDao;
     public ContratoController(IConfiguration config)
     {
       _contratoDao = new ContratoDao(config.GetConnectionString("MySqlConnection")!);
       _pagoDao = new PagoDao(config.GetConnectionString("MySqlConnection")!);
       _inmuebleDao = new InmuebleDao(config.GetConnectionString("MySqlConnection")!);
+      _tipoInmuebleDao = new TipoInmuebleDao(config.GetConnectionString("MySqlConnection")!);
     }
 
     // GET: /panel/contratos?page=1&pageSize=10
@@ -65,6 +67,7 @@ namespace inmobiliaria.Controllers
       ViewBag.Inquilinos = _contratoDao.ObtenerInquilinos();
       ViewBag.Inmuebles = _contratoDao.ObtenerInmuebles();
       ViewBag.Usuarios = _contratoDao.ObtenerUsuarios();
+      ViewBag.TiposInmueble = _tipoInmuebleDao.ObtenerTodos();
       return View();
     }
 
@@ -106,6 +109,7 @@ namespace inmobiliaria.Controllers
       return View(contrato);
     }
 
+    // TODO: Muchas validaciones no hacen falta ya que la lógica de rescindir/renovar contrato se hace en otros métodos
     [HttpPost("editar/{id}")]
     public IActionResult Editar(int id, Contrato contrato)
     {
@@ -139,21 +143,80 @@ namespace inmobiliaria.Controllers
         TempData["Mensaje"] = "Contrato editado correctamente.";
         return RedirectToAction("Index");
       }
+
       ViewBag.Inquilinos = _contratoDao.ObtenerInquilinos();
       ViewBag.Inmuebles = _contratoDao.ObtenerInmuebles();
       ViewBag.Usuarios = _contratoDao.ObtenerUsuarios();
       return View(contrato);
     }
 
-    [HttpPost("eliminar/{id}")]
-    public IActionResult EliminarConfirmado(int id)
+    // [HttpPost("eliminar/{id}")]
+    // public IActionResult EliminarConfirmado(int id)
+    // {
+    //   var contrato = _contratoDao.ObtenerPorId(id);
+    //   if (contrato != null && contrato.IdInmueble != null)
+    //   {
+    //     _inmuebleDao.ActualizarEstado((int)contrato.IdInmueble, "disponible");
+    //   }
+    //   _contratoDao.EliminarContrato(id);
+    //   return RedirectToAction("Index");
+    // }
+
+    [HttpPost("renovar")]
+    public IActionResult Renovar(int IdInquilino, int IdInmueble, DateTime NuevaFechaInicio, DateTime NuevaFechaFin, decimal NuevoMontoMensual)
     {
-      var contrato = _contratoDao.ObtenerPorId(id);
-      if (contrato != null && contrato.IdInmueble != null)
+      var idUsuario = int.Parse(User.FindFirst("Id")!.Value);
+      // TODO: Puede ser nulo
+      int idContratoAnterior = int.Parse(Request.Form["IdContratoAnterior"]);
+      var contratoAnterior = _contratoDao.ObtenerPorId(idContratoAnterior);
+
+      var nuevoContrato = new Contrato
       {
-        _inmuebleDao.ActualizarEstado((int)contrato.IdInmueble, "disponible");
+        IdInquilino = IdInquilino,
+        IdInmueble = IdInmueble,
+        IdUsuarioCreador = idUsuario,
+        FechaInicio = NuevaFechaInicio,
+        FechaFinOriginal = NuevaFechaFin,
+        MontoMensual = NuevoMontoMensual,
+        Estado = "vigente"
+      };
+      if (ModelState.IsValid)
+      {
+        _contratoDao.CrearContrato(nuevoContrato);
+        _inmuebleDao.ActualizarEstado(IdInmueble, "ocupado");
+        // Finalizar el contrato anterior si existe
+        if (contratoAnterior != null)
+        {
+          contratoAnterior.Estado = "finalizado";
+          _contratoDao.ActualizarContrato(contratoAnterior);
+        }
+        TempData["Mensaje"] = "Contrato renovado correctamente.";
+        return RedirectToAction("Index");
       }
-      _contratoDao.EliminarContrato(id);
+      // Si hay error, volver a la edición del contrato original
+      TempData["Error"] = "No se pudo renovar el contrato. Verifique los datos.";
+      return RedirectToAction("Index");
+    }
+
+    [HttpPost("rescindir")]
+    public IActionResult Rescindir(int IdContrato, DateTime FechaFinAnticipada, decimal MontoMensualRescision, decimal Multa)
+    {
+      Console.WriteLine($"Rescindiendo contrato {IdContrato} con fecha {FechaFinAnticipada} y multa {Multa}");
+      // Rescindiendo
+      var contrato = _contratoDao.ObtenerPorId(IdContrato);
+      if (contrato == null)
+        return NotFound();
+
+      contrato.Estado = "rescindido";
+      contrato.FechaFinAnticipada = FechaFinAnticipada;
+      contrato.Multa = Multa;
+      contrato.IdUsuarioFinalizador = int.Parse(User.FindFirst("Id")!.Value);
+      _contratoDao.RescindirContrato(contrato);
+
+      // Inmueble pasa a estado disponible
+      if (contrato.IdInmueble != null)
+        _inmuebleDao.ActualizarEstado((int)contrato.IdInmueble, "disponible");
+      TempData["Mensaje"] = "Contrato rescindido correctamente.";
       return RedirectToAction("Index");
     }
   }

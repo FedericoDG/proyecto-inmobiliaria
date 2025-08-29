@@ -2,6 +2,7 @@
 @{
   ViewData["Title"] = "Crear Contrato";
   Layout = "~/Views/Panel/_Layout.cshtml";
+  var tiposInmueble = ViewBag.TiposInmueble as List<inmobiliaria.Models.TipoInmueble>;
 }
 
 
@@ -17,6 +18,18 @@
           <form asp-action="Crear" method="post" autocomplete="off">
             <div class="row g-3">
               <div class="col-md-6">
+                <label class="form-label">Buscar inmueble disponible</label>
+                <button type="button" class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal"
+                  data-bs-target="#modalBuscarInmueble">
+                  <i class="bi bi-search"></i> Buscar inmueble
+                </button>
+                <select class="form-select" id="select-inmueble" size="3">
+                  <option value="">Seleccione inmueble</option>
+                </select>
+                <input type="hidden" asp-for="IdInmueble" id="id-inmueble-hidden" />
+                <span asp-validation-for="IdInmueble" class="text-danger small"></span>
+              </div>
+              <div class="col-md-6">
                 <label for="input-dni-inquilino" class="form-label">Buscar inquilino por DNI</label>
                 <input type="text" class="form-control" id="input-dni-inquilino" autocomplete="off"
                   placeholder="Escriba DNI" />
@@ -25,16 +38,6 @@
                 </select>
                 <input type="hidden" asp-for="IdInquilino" id="id-inquilino-hidden" />
                 <span asp-validation-for="IdInquilino" class="text-danger small"></span>
-              </div>
-              <div class="col-md-6">
-                <label for="input-direccion-inmueble" class="form-label">Buscar inmueble por dirección</label>
-                <input type="text" class="form-control" id="input-direccion-inmueble" autocomplete="off"
-                  placeholder="Escriba dirección" />
-                <select class="form-select mt-2" id="select-inmueble" size="3">
-                  <option value="">Seleccione inmueble</option>
-                </select>
-                <input type="hidden" asp-for="IdInmueble" id="id-inmueble-hidden" />
-                <span asp-validation-for="IdInmueble" class="text-danger small"></span>
               </div>
               <div class="col-md-6">
                 <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
@@ -68,6 +71,83 @@
   </div>
 </div>
 
+<!-- Modal búsqueda avanzada de inmuebles -->
+<div class="modal fade" id="modalBuscarInmueble" tabindex="-1" aria-labelledby="modalBuscarInmuebleLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalBuscarInmuebleLabel">Buscar inmuebles disponible</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-buscar-inmueble" onsubmit="return false;">
+          <div class="mb-2">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" id="modal-tipo">
+              <option value="">Seleccione tipo</option>
+              @if (tiposInmueble != null)
+              {
+                foreach (var tipo in tiposInmueble)
+                {
+                  if (tipo.Nombre.ToLower().Contains("departamento"))
+                  {
+                    <option value="@tipo.IdTipo" selected>@tipo.Nombre</option>
+                  }
+                  else
+                  {
+                    <option value="@tipo.IdTipo">@tipo.Nombre</option>
+                  }
+                }
+              }
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Uso</label>
+            <div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="modal-uso" id="modal-uso-residencial"
+                  value="residencial" checked>
+                <label class="form-check-label" for="modal-uso-residencial">Residencial</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="modal-uso" id="modal-uso-comercial"
+                  value="comercial">
+                <label class="form-check-label" for="modal-uso-comercial">Comercial</label>
+              </div>
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Ambientes</label>
+            <input type="number" class="form-control" id="modal-ambientes" min="1" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Precio máximo</label>
+            <input type="number" class="form-control" id="modal-precio" min="0" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Fecha de inicio</label>
+            <input type="date" class="form-control" id="modal-fecha-inicio" required />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Fecha de fin</label>
+            <input type="date" class="form-control" id="modal-fecha-fin" required />
+          </div>
+          <div class="d-flex justify-content-end mt-3">
+            <button type="button" class="btn btn-primary" id="btn-modal-buscar">
+              <i class="bi bi-search"></i> Buscar
+            </button>
+          </div>
+        </form>
+        <div id="modal-inmuebles-lista" class="mt-3"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 @section Scripts {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <script>
@@ -82,7 +162,7 @@
         const dni = inputDni.value;
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => {
-          if (dni.length >= 3) { // TODO: Sacar este "magic number" a una constante
+          if (dni.length >= 3) {
             fetch(`/panel/inquilinos/buscar-por-dni?dni=${encodeURIComponent(dni)}`)
               .then(res => res.json())
               .then(data => {
@@ -109,66 +189,74 @@
             selectInq.appendChild(option);
           }
           hiddenIdInq.value = '';
-        }, 350); // TODO: Sacar este "magic number" que representa el debounce a una constante
+        }, 350);
       });
 
       selectInq.addEventListener('change', function () {
         hiddenIdInq.value = selectInq.value;
       });
 
-      const inputDir = document.getElementById('input-direccion-inmueble');
+      // MODAL búsqueda avanzada de inmuebles
       const selectInm = document.getElementById('select-inmueble');
       const hiddenIdInm = document.getElementById('id-inmueble-hidden');
-      let debounceTimeoutInm;
+      const btnBuscarInmueble = document.querySelector('[data-bs-target="#modalBuscarInmueble"]');
+      const modalLista = document.getElementById('modal-inmuebles-lista');
+      const formBuscar = document.getElementById('form-buscar-inmueble');
 
-      inputDir.addEventListener('input', function () {
-        const direccion = inputDir.value;
-        clearTimeout(debounceTimeoutInm);
-        debounceTimeoutInm = setTimeout(() => {
-          if (direccion.length >= 3) {  // TODO: Sacar este "magic number" a una constante
-            fetch(`/panel/inmuebles/buscar-por-direccion?direccion=${encodeURIComponent(direccion)}`)
-              .then(res => res.json())
-              .then(data => {
-                selectInm.innerHTML = '';
-                if (data.length === 0) {
-                  const option = document.createElement('option');
-                  option.value = '';
-                  option.textContent = 'No se encontraron inmuebles';
-                  selectInm.appendChild(option);
-                } else {
-                  data.forEach(i => {
-                    const option = document.createElement('option');
-                    option.value = i.idInmueble;
-                    option.textContent = i.direccion;
-                    selectInm.appendChild(option);
-                  });
-                }
-              });
-          } else {
-            selectInm.innerHTML = '';
-            const option = document.createElement('option');
-            option.value = '';
-            option.textContent = 'Seleccione inmueble';
-            selectInm.appendChild(option);
-          }
-          hiddenIdInm.value = '';
-        }, 350);  // TODO: Sacar este "magic number" que representa el debounce a una constante
-      });
-
-      selectInm.addEventListener('change', function () {
-        hiddenIdInm.value = selectInm.value;
-        // Obtener el precio para ponerlo como "sugerencia"
-        if (selectInm.value) {
-          fetch(`/panel/inmuebles/obtener-precio/${selectInm.value}`)
-            .then(res => res.json())
-            .then(data => {
-              if (data && data.precio !== undefined) {
-                document.getElementById('MontoMensual').value = data.precio;
-              }
-            });
-        } else {
-          document.getElementById('MontoMensual').value = '';
+      document.getElementById('btn-modal-buscar').addEventListener('click', function () {
+        const fechaInicio = document.getElementById('modal-fecha-inicio').value;
+        const fechaFin = document.getElementById('modal-fecha-fin').value;
+        if (!fechaInicio || !fechaFin) {
+          modalLista.innerHTML = '<div class="alert alert-danger">Debes completar ambas fechas para buscar.</div>';
+          return;
         }
+        modalLista.innerHTML = '<div class="text-center">Buscando...</div>';
+        const idTipo = document.getElementById('modal-tipo').value;
+        const uso = document.querySelector('input[name="modal-uso"]:checked')?.value || '';
+        const ambientes = document.getElementById('modal-ambientes').value;
+        const precio = document.getElementById('modal-precio').value;
+        fetch(`/panel/inmuebles/buscar-disponibles?idTipo=${encodeURIComponent(idTipo)}&uso=${encodeURIComponent(uso)}&ambientes=${encodeURIComponent(ambientes)}&precio=${encodeURIComponent(precio)}&fechaInicio=${encodeURIComponent(fechaInicio)}&fechaFin=${encodeURIComponent(fechaFin)}`)
+          .then(res => res.json())
+          .then(data => {
+            modalLista.innerHTML = '';
+            if (data.length === 0) {
+              modalLista.innerHTML = '<div class="alert alert-warning">No se encontraron inmuebles disponibles</div>';
+            } else {
+              const ul = document.createElement('ul');
+              ul.style.maxHeight = '135px';
+              ul.style.overflowY = 'auto';
+              ul.className = 'list-group';
+              data.forEach(i => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.innerHTML = `<span>${i.direccion} - ${i.idTipo} - ${uso} - ${i.ambientes} amb. - $${i.precio}</span><button type="button" class="btn btn-sm btn-success">Seleccionar</button>`;
+                li.querySelector('button').addEventListener('click', function () {
+                  // Seleccionar inmueble y cerrar modal
+                  selectInm.innerHTML = '';
+                  const option = document.createElement('option');
+                  option.value = i.idInmueble;
+                  option.textContent = `${i.direccion} - ${i.idTipo} - ${uso} - ${i.ambientes} amb. - $${i.precio}`;
+                  selectInm.appendChild(option);
+                  selectInm.value = i.idInmueble;
+                  hiddenIdInm.value = i.idInmueble;
+                  document.getElementById('MontoMensual').value = i.precio;
+                  // Transferir fechas del modal al formulario principal
+                  const fechaInicioModal = document.getElementById('modal-fecha-inicio').value;
+                  const fechaFinModal = document.getElementById('modal-fecha-fin').value;
+                  const inputFechaInicio = document.querySelector('input[name="FechaInicio"]');
+                  const inputFechaFin = document.querySelector('input[name="FechaFinOriginal"]');
+                  inputFechaInicio.value = fechaInicioModal;
+                  inputFechaFin.value = fechaFinModal;
+                  inputFechaInicio.readOnly = true;
+                  inputFechaFin.readOnly = true;
+                  const modal = bootstrap.Modal.getInstance(document.getElementById('modalBuscarInmueble'));
+                  modal.hide();
+                });
+                ul.appendChild(li);
+              });
+              modalLista.appendChild(ul);
+            }
+          });
       });
     });
   </script>

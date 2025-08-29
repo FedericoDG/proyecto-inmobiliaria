@@ -46,7 +46,7 @@ Credenciales por defecto (modificables en `docker-compose.yml`):
 
 ### 3️⃣ Restaurar la base de datos
 
-El proyecto incluye un archivo script.sql con la estructura y datos iniciales.
+El proyecto incluye un archivo `script.sql` con la estructura y datos iniciales.
 Podés restaurarlo de dos formas:<br />
 🔹 Opción A: Desde phpMyAdmin
 

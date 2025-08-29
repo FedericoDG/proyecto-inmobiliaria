@@ -4,7 +4,6 @@
   Layout = "~/Views/Panel/_Layout.cshtml";
 }
 
-
 <div class="container py-4">
   <div class="row justify-content-center">
     <div class="col-md-10 col-lg-8">
@@ -20,7 +19,7 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label asp-for="IdInquilino" class="form-label">Inquilino</label>
-                <select asp-for="IdInquilino" class="form-select" disabled>
+                <select asp-for="IdInquilino" class="form-select">
                   <option value="">Seleccione inquilino</option>
                   @foreach (var i in ViewBag.Inquilinos)
                   {
@@ -28,15 +27,11 @@
                       @i.Nombre @i.Apellido (@i.Dni)</option>
                   }
                 </select>
-                <input type="hidden" asp-for="IdInquilino" />
                 <span asp-validation-for="IdInquilino" class="text-danger small"></span>
-                <label asp-for="FechaInicio" class="form-label mt-3">Fecha de Inicio</label>
-                <input asp-for="FechaInicio" class="form-control" type="date" readonly />
-                <span asp-validation-for="FechaInicio" class="text-danger small"></span>
               </div>
               <div class="col-md-6">
                 <label asp-for="IdInmueble" class="form-label">Inmueble</label>
-                <select asp-for="IdInmueble" class="form-select" disabled>
+                <select asp-for="IdInmueble" class="form-select">
                   <option value="">Seleccione inmueble</option>
                   @foreach (var inm in ViewBag.Inmuebles)
                   {
@@ -44,39 +39,43 @@
                       @inm.Direccion</option>
                   }
                 </select>
-                <input type="hidden" asp-for="IdInmueble" value="@Model.IdInmueble" />
                 <span asp-validation-for="IdInmueble" class="text-danger small"></span>
-                <label asp-for="FechaFinOriginal" class="form-label mt-3">Fecha de Finalización</label>
-                <input asp-for="FechaFinOriginal" class="form-control" type="date" readonly />
+              </div>
+            </div>
+            <div class="row g-3 mt-2">
+              <div class="col-md-6">
+                <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
+                <input asp-for="FechaInicio" class="form-control" type="date" />
+                <span asp-validation-for="FechaInicio" class="text-danger small"></span>
+              </div>
+              <div class="col-md-6">
+                <label asp-for="FechaFinOriginal" class="form-label">Fecha de Finalización</label>
+                <input asp-for="FechaFinOriginal" class="form-control" type="date" />
                 <span asp-validation-for="FechaFinOriginal" class="text-danger small"></span>
               </div>
-              <!-- Usuario Creador eliminado, lo maneja el controlador -->
-              <div class="col-md-6">
-                <label asp-for="FechaFinAnticipada" class="form-label">Fecha de Finalización Anticipada</label>
-                <input asp-for="FechaFinAnticipada" class="form-control" type="date" />
-                <span asp-validation-for="FechaFinAnticipada" class="text-danger small"></span>
-              </div>
+            </div>
+            <div class="row g-3 mt-2">
               <div class="col-md-6">
                 <label asp-for="MontoMensual" class="form-label">Monto Mensual</label>
-                <input asp-for="MontoMensual" class="form-control" />
+                <input asp-for="MontoMensual" class="form-control" type="number" min="0" required />
                 <span asp-validation-for="MontoMensual" class="text-danger small"></span>
               </div>
+            </div>
+            <div class="row g-3 mt-2">
               <div class="col-md-6">
-                <label asp-for="Estado" class="form-label">Estado</label>
-                <select asp-for="Estado" class="form-select">
-                  <option value="">Seleccione estado</option>
-                  <option value="vigente" selected="@(Model.Estado == "vigente" ? "selected" : null)">Vigente</option>
-                  <option value="finalizado" selected="@(Model.Estado == "finalizado" ? "selected" : null)">Finalizado
-                  </option>
-                  <option value="rescindido" selected="@(Model.Estado == "rescindido" ? "selected" : null)">Rescindido
-                  </option>
-                </select>
-                <span asp-validation-for="Estado" class="text-danger small"></span>
+                <!-- Botón Rescindir Contrato -->
+                <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal"
+                  data-bs-target="#modalRescindir" @(Model.Estado == "rescindido" ? "disabled" : "")>
+                  <i class="bi bi-x-circle me-1"></i> Rescindir contrato
+                </button>
               </div>
               <div class="col-md-6">
-                <label asp-for="Multa" class="form-label">Multa</label>
-                <input asp-for="Multa" class="form-control" />
-                <span asp-validation-for="Multa" class="text-danger small"></span>
+                <!-- Botón Renovar Contrato -->
+                <button type="button" class="btn btn-success w-100" data-bs-toggle="modal"
+                  data-bs-target="#modalRenovar" @((Model.Estado != "vigente" || DateTime.Now < Model.FechaFinOriginal)
+                                                                   ? "disabled" : "")>
+                  <i class="bi bi-arrow-repeat me-1"></i> Renovar contrato
+                </button>
               </div>
             </div>
             <div class="d-flex justify-content-end gap-2 mt-4">
@@ -89,6 +88,69 @@
             </div>
           </form>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Rescindir Contrato -->
+<div class="modal fade" id="modalRescindir" tabindex="-1" aria-labelledby="modalRescindirLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalRescindirLabel">Rescindir contrato</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-rescindir-contrato" method="post" action="/panel/contratos/rescindir">
+          <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
+          <div class="mb-3">
+            <label for="FechaFinAnticipada" class="form-label">Fecha de Finalización Anticipada</label>
+            <input type="date" class="form-control" name="FechaFinAnticipada" id="FechaFinAnticipada" required />
+          </div>
+          <div class="mb-3">
+            <label for="Multa" class="form-label">Multa</label>
+            <input type="number" class="form-control" name="Multa" id="Multa" min="0" required />
+          </div>
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-danger">Confirmar rescisión</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Renovar Contrato -->
+<div class="modal fade" id="modalRenovar" tabindex="-1" aria-labelledby="modalRenovarLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalRenovarLabel">Renovar contrato</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-renovar-contrato" method="post" action="/panel/contratos/renovar">
+          <input type="hidden" name="IdContratoAnterior" value="@Model.IdContrato" />
+          <input type="hidden" name="IdInquilino" value="@Model.IdInquilino" />
+          <input type="hidden" name="IdInmueble" value="@Model.IdInmueble" />
+          <div class="mb-3">
+            <label for="NuevaFechaInicio" class="form-label">Nueva Fecha de Inicio</label>
+            <input type="date" class="form-control" name="NuevaFechaInicio" id="NuevaFechaInicio" required />
+          </div>
+          <div class="mb-3">
+            <label for="NuevaFechaFin" class="form-label">Nueva Fecha de Finalización</label>
+            <input type="date" class="form-control" name="NuevaFechaFin" id="NuevaFechaFin" required />
+          </div>
+          <div class="mb-3">
+            <label for="NuevoMontoMensual" class="form-label">Nuevo Monto Mensual</label>
+            <input type="number" class="form-control" name="NuevoMontoMensual" id="NuevoMontoMensual" min="0"
+              required />
+          </div>
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-success">Confirmar renovación</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

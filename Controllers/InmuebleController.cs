@@ -123,11 +123,24 @@ namespace inmobiliaria.Controllers
       return RedirectToAction("Index");
     }
 
-    [HttpGet("buscar-por-direccion")]
-    public IActionResult BuscarPorDireccion(string direccion)
+    [HttpGet("buscar-disponibles")]
+    public IActionResult BuscarDisponibles(int? idTipo, string uso, int? ambientes, decimal? precio, string fechaInicio, string fechaFin)
     {
-      var inmuebles = _inmuebleDao.BuscarPorDireccion(direccion);
-      var resultado = inmuebles.Select(i => new { idInmueble = i.IdInmueble, direccion = i.Direccion }).ToList();
+      DateTime? inicio = null;
+      DateTime? fin = null;
+      if (!string.IsNullOrEmpty(fechaInicio))
+        inicio = DateTime.Parse(fechaInicio);
+      if (!string.IsNullOrEmpty(fechaFin))
+        fin = DateTime.Parse(fechaFin);
+      var lista = _inmuebleDao.BuscarDisponibles(idTipo, uso, ambientes, precio, inicio, fin);
+      var resultado = lista.Select(i => new
+      {
+        idInmueble = i.IdInmueble,
+        direccion = i.Direccion,
+        idTipo = i.IdTipo,
+        ambientes = i.CantidadAmbientes,
+        precio = i.Precio
+      });
       return Json(resultado);
     }
   }

@@ -5,9 +5,13 @@ using inmobiliaria.Data;
 
 namespace inmobiliaria.Repositories
 {
-    public class InmuebleDao(string connectionString)
+    public class InmuebleDao
     {
-        private readonly string _connectionString = connectionString;
+        private readonly string _connectionString;
+        public InmuebleDao(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
 
         public List<Inmueble> ObtenerTodos()
         {
@@ -119,6 +123,65 @@ namespace inmobiliaria.Repositories
             command.Parameters.AddWithValue("@estado", nuevoEstado);
             command.Parameters.AddWithValue("@idInmueble", idInmueble);
             command.ExecuteNonQuery();
+        }
+
+        public List<Inmueble> BuscarDisponibles(int? idTipo, string uso, int? ambientes, decimal? precioMax, DateTime? fechaInicio, DateTime? fechaFin)
+        {
+            var lista = new List<Inmueble>();
+            try
+            {
+                using (var connection = new MySqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    var query = @"SELECT * FROM inmuebles WHERE activo = 1"
+                        + (idTipo == null ? "" : " AND id_tipo = @idTipo")
+                        + (string.IsNullOrEmpty(uso) ? "" : " AND uso = @uso")
+                        + (ambientes == null ? "" : " AND cantidad_ambientes = @ambientes")
+                        + (precioMax == null ? "" : " AND precio <= @precioMax");
+
+                    // Si las fechas están presentes, filtrar inmuebles ocupados en ese rango
+                    if (fechaInicio != null && fechaFin != null)
+                    {
+                        query += @" AND NOT EXISTS (
+                                SELECT 1 FROM contratos c
+                                WHERE c.id_inmueble = inmuebles.id_inmueble
+                                  AND NOT (c.fecha_fin_original < @fechaInicio OR c.fecha_inicio > @fechaFin)
+                            )";
+                    }
+
+                    using var command = new MySqlCommand(query, connection);
+                    if (idTipo != null)
+                        command.Parameters.AddWithValue("@idTipo", idTipo);
+                    if (!string.IsNullOrEmpty(uso))
+                        command.Parameters.AddWithValue("@uso", uso);
+                    if (ambientes != null)
+                        command.Parameters.AddWithValue("@ambientes", ambientes);
+                    if (precioMax != null)
+                        command.Parameters.AddWithValue("@precioMax", precioMax);
+                    if (fechaInicio != null && fechaFin != null)
+                    {
+                        command.Parameters.AddWithValue("@fechaInicio", fechaInicio.Value.ToString("yyyy-MM-dd"));
+                        command.Parameters.AddWithValue("@fechaFin", fechaFin.Value.ToString("yyyy-MM-dd"));
+                    }
+                    // Imprimir la query y los valores de los parámetros
+                    Console.WriteLine($"BuscarDisponibles SQL: {query}");
+                    foreach (MySqlParameter p in command.Parameters)
+                    {
+                        Console.WriteLine($"  Param: {p.ParameterName} = {p.Value}");
+                    }
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        lista.Add(MapearInmueble(reader));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Loguear el error para depuración
+                Console.WriteLine($"Error en BuscarDisponibles: {ex.Message}");
+            }
+            return lista;
         }
 
         private static Inmueble MapearInmueble(IDataRecord reader)

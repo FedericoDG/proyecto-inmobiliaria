@@ -119,7 +119,7 @@
               var nombreApellido = $"{nombre} {apellido}".Trim();
               var avatarClaim = User.FindFirst("Avatar")?.Value;
               var avatarUrl = !string.IsNullOrEmpty(avatarClaim)
-              ? avatarClaim
+              ? (avatarClaim.StartsWith("/img/") ? avatarClaim + "?v=" + Guid.NewGuid() : avatarClaim)
               : $"https://ui-avatars.com/api/?name={nombreApellido}&background=0D8ABC&color=fff&size=32";
             }
             <a href="#" class="d-flex align-items-center link-light text-decoration-none dropdown-toggle"

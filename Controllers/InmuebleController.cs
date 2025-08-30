@@ -20,28 +20,22 @@ namespace inmobiliaria.Controllers
     {
       try
       {
-        var inmuebles = _inmuebleDao.ObtenerPaginadosPorPropietarioYEstado(page, pageSize, propietarioId, estado);
+        // Leer fechas del query string
+        var fechaInicioStr = Request.Query["fechaInicio"].ToString();
+        var fechaFinStr = Request.Query["fechaFin"].ToString();
+        DateTime? fechaInicio = null;
+        DateTime? fechaFin = null;
+        if (!string.IsNullOrEmpty(fechaInicioStr))
+          fechaInicio = DateTime.Parse(fechaInicioStr);
+        if (!string.IsNullOrEmpty(fechaFinStr))
+          fechaFin = DateTime.Parse(fechaFinStr);
+
+        var inmuebles = _inmuebleDao.ObtenerFiltrados(page, pageSize, propietarioId, estado, fechaInicio, fechaFin);
         var propietarios = _propietarioDao.ObtenerTodos();
         var tipos = _tipoInmuebleDao.ObtenerTodos();
-        int total;
 
-        // TODO: Sacarlo a un Dao
-        var connectionStringField = _inmuebleDao.GetType().GetField("_connectionString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var connectionString = connectionStringField?.GetValue(_inmuebleDao)?.ToString();
-        if (string.IsNullOrEmpty(connectionString))
-          throw new InvalidOperationException("Connection string is null or empty.");
-        using var conn = inmobiliaria.Data.Conexion.ObtenerConexion(connectionString);
-        string sql = "SELECT COUNT(*) FROM inmuebles WHERE activo = 1";
-        if (propietarioId != null)
-          sql += " AND id_propietario = @propietarioId";
-        if (!string.IsNullOrEmpty(estado))
-          sql += " AND estado = @estado";
-        using var cmd = new MySql.Data.MySqlClient.MySqlCommand(sql, conn);
-        if (propietarioId != null)
-          cmd.Parameters.AddWithValue("@propietarioId", propietarioId);
-        if (!string.IsNullOrEmpty(estado))
-          cmd.Parameters.AddWithValue("@estado", estado);
-        total = Convert.ToInt32(cmd.ExecuteScalar());
+        // Contar total filtrado
+        int total = _inmuebleDao.ContarFiltrados(propietarioId, estado, fechaInicio, fechaFin);
         int totalPages = (int)Math.Ceiling((double)total / pageSize);
         ViewBag.Propietarios = propietarios;
         ViewBag.TiposInmueble = tipos;

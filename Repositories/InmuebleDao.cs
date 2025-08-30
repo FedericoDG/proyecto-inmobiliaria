@@ -5,12 +5,92 @@ using inmobiliaria.Data;
 
 namespace inmobiliaria.Repositories
 {
-    public class InmuebleDao
+    public class InmuebleDao(string connectionString)
     {
-        private readonly string _connectionString;
-        public InmuebleDao(string connectionString)
+        private readonly string _connectionString = connectionString;
+
+        // Filtra inmuebles por propietario, estado y fechas de ocupación
+        public List<Inmueble> ObtenerFiltrados(int page, int pageSize, int? propietarioId, string? estado, DateTime? fechaInicio, DateTime? fechaFin)
         {
-            _connectionString = connectionString;
+            var lista = new List<Inmueble>();
+            try
+            {
+                using var conn = Conexion.ObtenerConexion(_connectionString);
+                var sql = "SELECT * FROM inmuebles WHERE activo = 1";
+                if (propietarioId != null)
+                    sql += " AND id_propietario = @propietarioId";
+                if (!string.IsNullOrEmpty(estado))
+                    sql += " AND estado = @estado";
+                if (fechaInicio != null && fechaFin != null)
+                {
+                    sql += @" AND NOT EXISTS (
+                                SELECT 1 FROM contratos c
+                                WHERE c.id_inmueble = inmuebles.id_inmueble
+                                  AND NOT (c.fecha_fin_original < @fechaInicio OR c.fecha_inicio > @fechaFin)
+                            )";
+                }
+                sql += " LIMIT @limit OFFSET @offset";
+                using var cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@limit", pageSize);
+                cmd.Parameters.AddWithValue("@offset", (page - 1) * pageSize);
+                if (propietarioId != null)
+                    cmd.Parameters.AddWithValue("@propietarioId", propietarioId);
+                if (!string.IsNullOrEmpty(estado))
+                    cmd.Parameters.AddWithValue("@estado", estado);
+                if (fechaInicio != null && fechaFin != null)
+                {
+                    cmd.Parameters.AddWithValue("@fechaInicio", fechaInicio.Value.ToString("yyyy-MM-dd"));
+                    cmd.Parameters.AddWithValue("@fechaFin", fechaFin.Value.ToString("yyyy-MM-dd"));
+                }
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(MapearInmueble(reader));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ObtenerFiltrados error: {ex.Message}");
+            }
+            return lista;
+        }
+
+        // Cuenta inmuebles filtrados por propietario, estado y fechas de ocupación
+        public int ContarFiltrados(int? propietarioId, string? estado, DateTime? fechaInicio, DateTime? fechaFin)
+        {
+            try
+            {
+                using var conn = Conexion.ObtenerConexion(_connectionString);
+                var sql = "SELECT COUNT(*) FROM inmuebles WHERE activo = 1";
+                if (propietarioId != null)
+                    sql += " AND id_propietario = @propietarioId";
+                if (!string.IsNullOrEmpty(estado))
+                    sql += " AND estado = @estado";
+                if (fechaInicio != null && fechaFin != null)
+                {
+                    sql += @" AND NOT EXISTS (
+                                SELECT 1 FROM contratos c
+                                WHERE c.id_inmueble = inmuebles.id_inmueble
+                                  AND NOT (c.fecha_fin_original < @fechaInicio OR c.fecha_inicio > @fechaFin)
+                            )";
+                }
+                using var cmd = new MySqlCommand(sql, conn);
+                if (propietarioId != null)
+                    cmd.Parameters.AddWithValue("@propietarioId", propietarioId);
+                if (!string.IsNullOrEmpty(estado))
+                    cmd.Parameters.AddWithValue("@estado", estado);
+                if (fechaInicio != null && fechaFin != null)
+                {
+                    cmd.Parameters.AddWithValue("@fechaInicio", fechaInicio.Value.ToString("yyyy-MM-dd"));
+                    cmd.Parameters.AddWithValue("@fechaFin", fechaFin.Value.ToString("yyyy-MM-dd"));
+                }
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ContarFiltrados error: {ex.Message}");
+                return 0;
+            }
         }
 
         public List<Inmueble> ObtenerTodos()

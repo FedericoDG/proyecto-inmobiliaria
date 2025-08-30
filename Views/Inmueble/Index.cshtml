@@ -43,55 +43,88 @@
 
 
 
-<div class="d-flex justify-content-end mb-3">
-    <form method="get" class="bg-white border rounded shadow-sm p-3" style="max-width: 300px; min-width: 220px;">
-        @{
-            var estadoSeleccionado = Context.Request.Query["estado"].ToString();
-            var propietarioId = Context.Request.Query["propietarioId"].ToString();
-        }
-        @if (!string.IsNullOrEmpty(propietarioId))
-        {
-            <input type="hidden" name="propietarioId" value="@propietarioId" />
-        }
-        <label for="estado" class="form-label fw-bold mb-2">Filtrar por estado:</label>
-        <div class="input-group">
-            <select id="estado" name="estado" class="form-select form-select-sm">
-                @if (string.IsNullOrEmpty(estadoSeleccionado))
-                {
-                    <option value="" selected>Todos los estados</option>
+<div class="d-flex justify-content-end mb-3 gap-3 flex-wrap">
+    <!-- estado -->
+    <div class="card shadow-sm border-0 flex-grow-1" style="min-width: 280px; max-width: 400px;">
+        <div class="card-body p-3">
+            <form method="get" class="mb-0">
+                @{
+                    var estadoSeleccionado = Context.Request.Query["estado"].ToString();
+                    var propietarioId = Context.Request.Query["propietarioId"].ToString();
                 }
-                else
+                @if (!string.IsNullOrEmpty(propietarioId))
                 {
-                    <option value="">Todos los estados</option>
+                    <input type="hidden" name="propietarioId" value="@propietarioId" />
                 }
-                @if (estadoSeleccionado == "disponible")
-                {
-                    <option value="disponible" selected>Disponible</option>
-                }
-                else
-                {
-                    <option value="disponible">Disponible</option>
-                }
-                @if (estadoSeleccionado == "suspendido")
-                {
-                    <option value="suspendido" selected>Suspendido</option>
-                }
-                else
-                {
-                    <option value="suspendido">Suspendido</option>
-                }
-                @if (estadoSeleccionado == "ocupado")
-                {
-                    <option value="ocupado" selected>Ocupado</option>
-                }
-                else
-                {
-                    <option value="ocupado">Ocupado</option>
-                }
-            </select>
-            <button type="submit" class="btn btn-primary btn-sm ms-2">Filtrar</button>
+                <label class="form-label fw-bold mb-2">Filtrar por estado</label>
+                <div class="d-flex align-items-center gap-2">
+                    <select id="estado" name="estado" class="form-select form-select-sm" style="max-width: 180px;">
+                        @if (string.IsNullOrEmpty(estadoSeleccionado))
+                        {
+                            <option value="" selected>Todos los estados</option>
+                        }
+                        else
+                        {
+                            <option value="">Todos los estados</option>
+                        }
+                        @if (estadoSeleccionado == "disponible")
+                        {
+                            <option value="disponible" selected>Disponible</option>
+                        }
+                        else
+                        {
+                            <option value="disponible">Disponible</option>
+                        }
+                        @if (estadoSeleccionado == "suspendido")
+                        {
+                            <option value="suspendido" selected>Suspendido</option>
+                        }
+                        else
+                        {
+                            <option value="suspendido">Suspendido</option>
+                        }
+                        @if (estadoSeleccionado == "ocupado")
+                        {
+                            <option value="ocupado" selected>Ocupado</option>
+                        }
+                        else
+                        {
+                            <option value="ocupado">Ocupado</option>
+                        }
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+                    <a href="/panel/inmuebles" class="btn btn-outline-secondary btn-sm">Borrar filtros</a>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
+    <!-- fechas -->
+    <div class="card shadow-sm border-0 flex-grow-1" style="min-width: 280px; max-width: 650px;">
+        <div class="card-body p-3">
+            <form method="get" class="mb-0">
+                @{
+                    var fechaInicio = Context.Request.Query["fechaInicio"].ToString();
+                    var fechaFin = Context.Request.Query["fechaFin"].ToString();
+                    var propietarioId = Context.Request.Query["propietarioId"].ToString();
+                }
+                @if (!string.IsNullOrEmpty(propietarioId))
+                {
+                    <input type="hidden" name="propietarioId" value="@propietarioId" />
+                }
+                <label class="form-label fw-bold mb-2">Filtrar disponibles</label>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="input-group-text">Inicio</span>
+                    <input type="date" name="fechaInicio" class="form-control form-control-sm" value="@fechaInicio"
+                        style="max-width: 150px;" />
+                    <span class="input-group-text">Fin</span>
+                    <input type="date" name="fechaFin" class="form-control form-control-sm" value="@fechaFin"
+                        style="max-width: 150px;" />
+                    <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+                    <a href="/panel/inmuebles" class="btn btn-outline-secondary btn-sm">Borrar filtros</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <table class="table table-striped">

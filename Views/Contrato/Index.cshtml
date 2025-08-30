@@ -31,6 +31,45 @@
   </div>
 </div>
 
+
+<div class="d-flex justify-content-end mb-3">
+  <form method="get" class="bg-white border rounded shadow-sm p-3" style="max-width: 600px; min-width: 350px;"
+    id="filtroContratos">
+    @{
+      var fechaDesde = Context.Request.Query["fechaDesde"].ToString();
+      var fechaHasta = Context.Request.Query["fechaHasta"].ToString();
+    }
+    <label class="form-label fw-bold mb-2">Filtros:</label>
+    <div class="row g-2 align-items-center">
+      <div class="col-auto">
+        <span class="input-group-text">Vigente desde</span>
+      </div>
+      <div class="col">
+        <input type="date" name="fechaDesde" class="form-control form-control-sm" value="@fechaDesde" id="fechaDesde" />
+      </div>
+      <div class="col-auto">
+        <span class="input-group-text">hasta</span>
+      </div>
+      <div class="col">
+        <input type="date" name="fechaHasta" class="form-control form-control-sm" value="@fechaHasta" id="fechaHasta" />
+      </div>
+      <div class="col-auto">
+        <span class="input-group-text">Vence en (días)</span>
+      </div>
+      <div class="col">
+        <input type="number" name="diasVencimiento" class="form-control form-control-sm" min="1"
+          placeholder="Cantidad de días" value="@Context.Request.Query["diasVencimiento"]" id="diasVencimiento" />
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+      </div>
+      <div class="col-auto">
+        <a href="/panel/contratos" class="btn btn-outline-secondary btn-sm">Borrar filtros</a>
+      </div>
+    </div>
+  </form>
+</div>
+
 <div class="table-responsive mb-3">
   <table class="table table-hover align-middle shadow-sm">
     <thead class="table-primary">
@@ -84,16 +123,19 @@
 <nav aria-label="Paginación">
   <ul class="pagination justify-content-center">
     <li class="page-item @(ViewBag.Page <= 1 ? "disabled" : "")">
-      <a class="page-link" href="?page=@(ViewBag.Page - 1)&pageSize=@ViewBag.PageSize">Anterior</a>
+      <a class="page-link"
+        href="?page=@(ViewBag.Page - 1)&pageSize=@ViewBag.PageSize@(ViewBag.InmuebleId != null ? "&inmuebleId=" + ViewBag.InmuebleId : "")">Anterior</a>
     </li>
     @for (int i = 1; i <= ViewBag.TotalPages; i++)
     {
       <li class="page-item @(i == ViewBag.Page ? "active" : "")">
-        <a class="page-link" href="?page=@i&pageSize=@ViewBag.PageSize">@i</a>
+        <a class="page-link"
+          href="?page=@i&pageSize=@ViewBag.PageSize@(ViewBag.InmuebleId != null ? "&inmuebleId=" + ViewBag.InmuebleId : "")">@i</a>
       </li>
     }
     <li class="page-item @(ViewBag.Page >= ViewBag.TotalPages ? "disabled" : "")">
-      <a class="page-link" href="?page=@(ViewBag.Page + 1)&pageSize=@ViewBag.PageSize">Siguiente</a>
+      <a class="page-link"
+        href="?page=@(ViewBag.Page + 1)&pageSize=@ViewBag.PageSize@(ViewBag.InmuebleId != null ? "&inmuebleId=" + ViewBag.InmuebleId : "")">Siguiente</a>
     </li>
   </ul>
 </nav>
@@ -101,4 +143,48 @@
 
 @section Scripts {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <script>
+    // Filtros excluyentes: si se completa uno, limpiar/deshabilitar el otro
+    document.addEventListener('DOMContentLoaded', function () {
+      const fechaDesde = document.getElementById('fechaDesde');
+      const fechaHasta = document.getElementById('fechaHasta');
+      const diasVencimiento = document.getElementById('diasVencimiento');
+      const diasVencimientoPersonalizado = document.getElementById('diasVencimientoPersonalizado');
+      const form = document.getElementById('filtroContratos');
+
+      function limpiarFechas() {
+        fechaDesde.value = '';
+        fechaHasta.value = '';
+      }
+      function limpiarDias() {
+        diasVencimiento.value = '';
+        diasVencimientoPersonalizado.value = '';
+      }
+
+      diasVencimiento.addEventListener('change', function () {
+        if (diasVencimiento.value) limpiarFechas();
+      });
+      diasVencimientoPersonalizado.addEventListener('input', function () {
+        if (diasVencimientoPersonalizado.value) limpiarFechas();
+      });
+      fechaDesde.addEventListener('input', function () {
+        if (fechaDesde.value || fechaHasta.value) limpiarDias();
+      });
+      fechaHasta.addEventListener('input', function () {
+        if (fechaDesde.value || fechaHasta.value) limpiarDias();
+      });
+
+      // Eliminar inputs vacíos antes de enviar el formulario para evitar envíos innecesarios
+      form.addEventListener('submit', function (e) {
+        [fechaDesde, fechaHasta, diasVencimiento, diasVencimientoPersonalizado].forEach(function (input) {
+          if (!input.value) input.disabled = true;
+        });
+        setTimeout(function () {
+          [fechaDesde, fechaHasta, diasVencimiento, diasVencimientoPersonalizado].forEach(function (input) {
+            input.disabled = false;
+          });
+        }, 1000);
+      });
+    });
+  </script>
 }

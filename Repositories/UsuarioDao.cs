@@ -13,67 +13,99 @@ namespace inmobiliaria.Repositories
 
         public Usuario? Login(string email, string contrasena)
         {
-            using var conn = Conexion.ObtenerConexion(_connectionString);
-            var cmd = new MySqlCommand(@"SELECT * FROM usuarios WHERE email = @email AND activo = TRUE", conn);
-            cmd.Parameters.AddWithValue("@email", email);
-            using var reader = cmd.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                var usuario = MapearUsuario(reader);
-                var hasher = new PasswordHasher<Usuario>();
-                var resultado = hasher.VerifyHashedPassword(usuario, usuario.Contrasena, contrasena);
-                if (resultado == PasswordVerificationResult.Success)
+                using var conn = Conexion.ObtenerConexion(_connectionString);
+                var cmd = new MySqlCommand(@"SELECT * FROM usuarios WHERE email = @email AND activo = TRUE", conn);
+                cmd.Parameters.AddWithValue("@email", email);
+                using var reader = cmd.ExecuteReader();
+                if (reader.Read())
                 {
-                    return usuario;
+                    var usuario = MapearUsuario(reader);
+                    var hasher = new PasswordHasher<Usuario>();
+                    var resultado = hasher.VerifyHashedPassword(usuario, usuario.Contrasena, contrasena);
+                    if (resultado == PasswordVerificationResult.Success)
+                    {
+                        return usuario;
+                    }
                 }
+                return null;
             }
-            return null;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
         }
 
         public bool CrearUsuario(Usuario usuario)
         {
-            using var connection = Conexion.ObtenerConexion(_connectionString);
-            var hasher = new PasswordHasher<Usuario>();
-            usuario.Contrasena = hasher.HashPassword(usuario, usuario.Contrasena);
-            using var command = new MySqlCommand(@"INSERT INTO usuarios 
+            try
+            {
+                using var connection = Conexion.ObtenerConexion(_connectionString);
+                var hasher = new PasswordHasher<Usuario>();
+                usuario.Contrasena = hasher.HashPassword(usuario, usuario.Contrasena);
+                using var command = new MySqlCommand(@"INSERT INTO usuarios 
         (email, contrasena, nombre, apellido, rol, avatar, activo) 
         VALUES (@email, @contrasena, @nombre, @apellido, @rol, @avatar, @activo)", connection);
 
-            command.Parameters.AddWithValue("@email", usuario.Email);
-            command.Parameters.AddWithValue("@contrasena", usuario.Contrasena);
-            command.Parameters.AddWithValue("@nombre", usuario.Nombre ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@apellido", usuario.Apellido);
-            command.Parameters.AddWithValue("@rol", usuario.Rol);
-            command.Parameters.AddWithValue("@avatar", usuario.Avatar ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@activo", usuario.Activo);
+                command.Parameters.AddWithValue("@email", usuario.Email);
+                command.Parameters.AddWithValue("@contrasena", usuario.Contrasena);
+                command.Parameters.AddWithValue("@nombre", usuario.Nombre ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@apellido", usuario.Apellido);
+                command.Parameters.AddWithValue("@rol", usuario.Rol);
+                command.Parameters.AddWithValue("@avatar", usuario.Avatar ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@activo", usuario.Activo);
 
-            return command.ExecuteNonQuery() > 0;
+                return command.ExecuteNonQuery() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
         }
 
         public List<Usuario> ObtenerTodos()
         {
-            var lista = new List<Usuario>();
-            using var conn = Conexion.ObtenerConexion(_connectionString);
-            var cmd = new MySqlCommand("SELECT * FROM usuarios WHERE activo = 1", conn);
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            try
             {
-                lista.Add(MapearUsuario(reader));
+                var lista = new List<Usuario>();
+                using var conn = Conexion.ObtenerConexion(_connectionString);
+                var cmd = new MySqlCommand("SELECT * FROM usuarios WHERE activo = 1", conn);
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(MapearUsuario(reader));
+                }
+                return lista;
             }
-            return lista;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return new List<Usuario>();
+            }
         }
 
         public Usuario? ObtenerPorId(int id)
         {
-            using var conn = Conexion.ObtenerConexion(_connectionString);
-            var cmd = new MySqlCommand("SELECT * FROM usuarios WHERE id_usuario = @id", conn);
-            cmd.Parameters.AddWithValue("@id", id);
-            using var reader = cmd.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                return MapearUsuario(reader);
+                using var conn = Conexion.ObtenerConexion(_connectionString);
+                var cmd = new MySqlCommand("SELECT * FROM usuarios WHERE id_usuario = @id", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                using var reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    return MapearUsuario(reader);
+                }
+                return null;
             }
-            return null;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
         }
 
         public bool ActualizarUsuario(Usuario usuario)

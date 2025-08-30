@@ -13,52 +13,92 @@ namespace inmobiliaria.Controllers
     [HttpGet("")]
     public IActionResult Index()
     {
-      var tipos = _tipoDao.ObtenerTodos();
-      return View(tipos);
+      try
+      {
+        var tipos = _tipoDao.ObtenerTodos();
+        return View(tipos);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Index] Error: {ex.Message}");
+        return View(new List<TipoInmueble>());
+      }
     }
 
     // GET: /panel/tipos-inmueble/crear
     [HttpGet("crear")]
     public IActionResult Crear()
     {
-      return View();
+      try
+      {
+        return View();
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Crear GET] Error: {ex.Message}");
+        return View();
+      }
     }
 
     // POST: /panel/tipos-inmueble/crear
     [HttpPost("crear")]
     public IActionResult Crear(TipoInmueble tipo)
     {
-      if (ModelState.IsValid)
+      try
       {
-        _tipoDao.CrearTipo(tipo);
-        TempData["Mensaje"] = "Tipo de inmueble creado correctamente.";
-        return RedirectToAction("Index");
+        if (ModelState.IsValid)
+        {
+          _tipoDao.CrearTipo(tipo);
+          TempData["Mensaje"] = "Tipo de inmueble creado correctamente.";
+          return RedirectToAction("Index");
+        }
+        return View(tipo);
       }
-      return View(tipo);
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Crear POST] Error: {ex.Message}");
+        return View(tipo);
+      }
     }
 
     // GET: /panel/tipos-inmueble/editar/{id}
     [HttpGet("editar/{id}")]
     public IActionResult Editar(int id)
     {
-      var tipo = _tipoDao.ObtenerPorId(id);
-      if (tipo == null)
+      try
+      {
+        var tipo = _tipoDao.ObtenerPorId(id);
+        if (tipo == null)
+          return NotFound();
+        return View(tipo);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Editar GET] Error: {ex.Message}");
         return NotFound();
-      return View(tipo);
+      }
     }
 
     // POST: /panel/tipos-inmueble/editar/{id}
     [HttpPost("editar/{id}")]
     public IActionResult Editar(int id, TipoInmueble tipo)
     {
-      if (ModelState.IsValid)
+      try
       {
-        tipo.IdTipo = id;
-        _tipoDao.ActualizarTipo(tipo);
-        TempData["Mensaje"] = "Tipo de inmueble editado correctamente.";
-        return RedirectToAction("Index");
+        if (ModelState.IsValid)
+        {
+          tipo.IdTipo = id;
+          _tipoDao.ActualizarTipo(tipo);
+          TempData["Mensaje"] = "Tipo de inmueble editado correctamente.";
+          return RedirectToAction("Index");
+        }
+        return View(tipo);
       }
-      return View(tipo);
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Editar POST] Error: {ex.Message}");
+        return View(tipo);
+      }
     }
 
     // POST: /panel/tipos-inmueble/eliminar/{id}

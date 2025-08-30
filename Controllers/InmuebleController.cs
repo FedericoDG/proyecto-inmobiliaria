@@ -14,134 +14,217 @@ namespace inmobiliaria.Controllers
 
     // GET: /panel/inmuebles
     [HttpGet("")]
-    public IActionResult Index(int page = 1, int pageSize = PaginacionConfig.PageSizeDefault)
+
+    // GET: /panel/inmuebles
+    public IActionResult Index(int page = 1, int pageSize = PaginacionConfig.PageSizeDefault, string? estado = null, int? propietarioId = null)
     {
-      var inmuebles = _inmuebleDao.ObtenerPaginados(page, pageSize);
-      var propietarios = _propietarioDao.ObtenerTodos();
-      var tipos = _tipoInmuebleDao.ObtenerTodos();
-      int total = _inmuebleDao.ContarInmuebles();
-      int totalPages = (int)Math.Ceiling((double)total / pageSize);
-      ViewBag.Propietarios = propietarios;
-      ViewBag.TiposInmueble = tipos;
-      ViewBag.Page = page;
-      ViewBag.PageSize = pageSize;
-      ViewBag.TotalPages = totalPages;
-      return View(inmuebles);
+      try
+      {
+        var inmuebles = _inmuebleDao.ObtenerPaginadosPorPropietarioYEstado(page, pageSize, propietarioId, estado);
+        var propietarios = _propietarioDao.ObtenerTodos();
+        var tipos = _tipoInmuebleDao.ObtenerTodos();
+        int total;
+
+        // TODO: Sacarlo a un Dao
+        var connectionStringField = _inmuebleDao.GetType().GetField("_connectionString", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var connectionString = connectionStringField?.GetValue(_inmuebleDao)?.ToString();
+        if (string.IsNullOrEmpty(connectionString))
+          throw new InvalidOperationException("Connection string is null or empty.");
+        using var conn = inmobiliaria.Data.Conexion.ObtenerConexion(connectionString);
+        string sql = "SELECT COUNT(*) FROM inmuebles WHERE activo = 1";
+        if (propietarioId != null)
+          sql += " AND id_propietario = @propietarioId";
+        if (!string.IsNullOrEmpty(estado))
+          sql += " AND estado = @estado";
+        using var cmd = new MySql.Data.MySqlClient.MySqlCommand(sql, conn);
+        if (propietarioId != null)
+          cmd.Parameters.AddWithValue("@propietarioId", propietarioId);
+        if (!string.IsNullOrEmpty(estado))
+          cmd.Parameters.AddWithValue("@estado", estado);
+        total = Convert.ToInt32(cmd.ExecuteScalar());
+        int totalPages = (int)Math.Ceiling((double)total / pageSize);
+        ViewBag.Propietarios = propietarios;
+        ViewBag.TiposInmueble = tipos;
+        ViewBag.Page = page;
+        ViewBag.PageSize = pageSize;
+        ViewBag.TotalPages = totalPages;
+        ViewBag.EstadoSeleccionado = estado;
+        ViewBag.PropietarioId = propietarioId;
+        return View(inmuebles);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Index] Error: {ex.Message}");
+        return View(new List<Inmueble>());
+      }
     }
 
     // GET: /panel/inmuebles/obtener-precio/{id}
     [HttpGet("obtener-precio/{id}")]
     public IActionResult ObtenerPrecio(int id)
     {
-      var inmueble = _inmuebleDao.ObtenerPorId(id);
-      if (inmueble == null)
+      try
+      {
+        var inmueble = _inmuebleDao.ObtenerPorId(id);
+        if (inmueble == null)
+          return NotFound();
+        return Json(new { precio = inmueble.Precio });
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[ObtenerPrecio] Error: {ex.Message}");
         return NotFound();
-      return Json(new { precio = inmueble.Precio });
+      }
     }
 
     // GET: /panel/inmuebles/crear
     [HttpGet("crear")]
     public IActionResult Crear()
     {
-      var propietarios = _propietarioDao.ObtenerTodos();
-      var tipos = _tipoInmuebleDao.ObtenerTodos();
-      ViewBag.Propietarios = propietarios;
-      ViewBag.TiposInmueble = tipos;
-      return View();
+      try
+      {
+        var propietarios = _propietarioDao.ObtenerTodos();
+        var tipos = _tipoInmuebleDao.ObtenerTodos();
+        ViewBag.Propietarios = propietarios;
+        ViewBag.TiposInmueble = tipos;
+        return View();
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Crear GET] Error: {ex.Message}");
+        return View();
+      }
     }
 
     // POST: /panel/inmuebles/crear
     [HttpPost("crear")]
     public IActionResult Crear(Inmueble inmueble)
     {
-      // if (ModelState.IsValid)
-      // {
-
-      // }
-      if (inmueble.Uso != "residencial" && inmueble.Uso != "comercial")
+      try
       {
-        ModelState.AddModelError("Uso", "El uso debe ser 'residencial' o 'comercial'.");
+        if (inmueble.Uso != "residencial" && inmueble.Uso != "comercial")
+        {
+          ModelState.AddModelError("Uso", "El uso debe ser 'residencial' o 'comercial'.");
+        }
+        if (inmueble.Estado != "disponible" && inmueble.Estado != "suspendido" && inmueble.Estado != "ocupado")
+        {
+          ModelState.AddModelError("Estado", "El estado debe ser 'disponible', 'suspendido' u 'ocupado'.");
+        }
+        var propietarios = _propietarioDao.ObtenerTodos();
+        var tipos = _tipoInmuebleDao.ObtenerTodos();
+        ViewBag.Propietarios = propietarios;
+        ViewBag.TiposInmueble = tipos;
+        if (ModelState.IsValid)
+        {
+          _inmuebleDao.CrearInmueble(inmueble);
+          TempData["Mensaje"] = "Inmueble creado correctamente.";
+          return RedirectToAction("Index");
+        }
+        return View(inmueble);
       }
-      if (inmueble.Estado != "disponible" && inmueble.Estado != "suspendido" && inmueble.Estado != "ocupado")
+      catch (Exception ex)
       {
-        ModelState.AddModelError("Estado", "El estado debe ser 'disponible', 'suspendido' u 'ocupado'.");
+        Console.WriteLine($"[Crear POST] Error: {ex.Message}");
+        return View(inmueble);
       }
-      var propietarios = _propietarioDao.ObtenerTodos();
-      var tipos = _tipoInmuebleDao.ObtenerTodos();
-      ViewBag.Propietarios = propietarios;
-      ViewBag.TiposInmueble = tipos;
-      if (ModelState.IsValid)
-      {
-        _inmuebleDao.CrearInmueble(inmueble);
-        TempData["Mensaje"] = "Inmueble creado correctamente.";
-        return RedirectToAction("Index");
-      }
-      return View(inmueble);
     }
 
     // GET: /panel/inmuebles/editar/{id}
     [HttpGet("editar/{id}")]
     public IActionResult Editar(int id)
     {
-      var inmueble = _inmuebleDao.ObtenerPorId(id);
-      if (inmueble == null)
+      try
+      {
+        var inmueble = _inmuebleDao.ObtenerPorId(id);
+        if (inmueble == null)
+          return NotFound();
+        var propietarios = _propietarioDao.ObtenerTodos();
+        var tipos = _tipoInmuebleDao.ObtenerTodos();
+        ViewBag.Propietarios = propietarios;
+        ViewBag.TiposInmueble = tipos;
+        return View(inmueble);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Editar GET] Error: {ex.Message}");
         return NotFound();
-      var propietarios = _propietarioDao.ObtenerTodos();
-      var tipos = _tipoInmuebleDao.ObtenerTodos();
-      ViewBag.Propietarios = propietarios;
-      ViewBag.TiposInmueble = tipos;
-      return View(inmueble);
+      }
     }
 
     // POST: /panel/inmuebles/editar/{id}
     [HttpPost("editar/{id}")]
     public IActionResult Editar(int id, Inmueble inmueble)
     {
-      if (inmueble.Uso != "residencial" && inmueble.Uso != "comercial")
+      try
       {
-        ModelState.AddModelError("Uso", "El uso debe ser 'residencial' o 'comercial'.");
+        if (inmueble.Uso != "residencial" && inmueble.Uso != "comercial")
+        {
+          ModelState.AddModelError("Uso", "El uso debe ser 'residencial' o 'comercial'.");
+        }
+        if (inmueble.Estado != "disponible" && inmueble.Estado != "suspendido" && inmueble.Estado != "ocupado")
+        {
+          ModelState.AddModelError("Estado", "El estado debe ser 'disponible', 'suspendido' u 'ocupado'.");
+        }
+        if (ModelState.IsValid)
+        {
+          inmueble.IdInmueble = id;
+          _inmuebleDao.ActualizarInmueble(inmueble);
+          TempData["Mensaje"] = "Inmueble editado correctamente.";
+          return RedirectToAction("Index");
+        }
+        return View(inmueble);
       }
-      if (inmueble.Estado != "disponible" && inmueble.Estado != "suspendido" && inmueble.Estado != "ocupado")
+      catch (Exception ex)
       {
-        ModelState.AddModelError("Estado", "El estado debe ser 'disponible', 'suspendido' u 'ocupado'.");
+        Console.WriteLine($"[Editar POST] Error: {ex.Message}");
+        return View(inmueble);
       }
-      if (ModelState.IsValid)
-      {
-        inmueble.IdInmueble = id;
-        _inmuebleDao.ActualizarInmueble(inmueble);
-        TempData["Mensaje"] = "Inmueble editado correctamente.";
-        return RedirectToAction("Index");
-      }
-      return View(inmueble);
     }
 
     // POST: /panel/inmuebles/eliminar/{id}
     [HttpPost("eliminar/{id}")]
     public IActionResult EliminarConfirmado(int id)
     {
-      _inmuebleDao.EliminarInmueble(id);
-      return RedirectToAction("Index");
+      try
+      {
+        _inmuebleDao.EliminarInmueble(id);
+        return RedirectToAction("Index");
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Eliminar] Error: {ex.Message}");
+        return RedirectToAction("Index");
+      }
     }
 
+    // GET: /panel/inmuebles/buscar-disponibles
     [HttpGet("buscar-disponibles")]
     public IActionResult BuscarDisponibles(int? idTipo, string uso, int? ambientes, decimal? precio, string fechaInicio, string fechaFin)
     {
-      DateTime? inicio = null;
-      DateTime? fin = null;
-      if (!string.IsNullOrEmpty(fechaInicio))
-        inicio = DateTime.Parse(fechaInicio);
-      if (!string.IsNullOrEmpty(fechaFin))
-        fin = DateTime.Parse(fechaFin);
-      var lista = _inmuebleDao.BuscarDisponibles(idTipo, uso, ambientes, precio, inicio, fin);
-      var resultado = lista.Select(i => new
+      try
       {
-        idInmueble = i.IdInmueble,
-        direccion = i.Direccion,
-        idTipo = i.IdTipo,
-        ambientes = i.CantidadAmbientes,
-        precio = i.Precio
-      });
-      return Json(resultado);
+        DateTime? inicio = null;
+        DateTime? fin = null;
+        if (!string.IsNullOrEmpty(fechaInicio))
+          inicio = DateTime.Parse(fechaInicio);
+        if (!string.IsNullOrEmpty(fechaFin))
+          fin = DateTime.Parse(fechaFin);
+        var lista = _inmuebleDao.BuscarDisponibles(idTipo, uso, ambientes, precio, inicio, fin);
+        var resultado = lista.Select(i => new
+        {
+          idInmueble = i.IdInmueble,
+          direccion = i.Direccion,
+          idTipo = i.IdTipo,
+          ambientes = i.CantidadAmbientes,
+          precio = i.Precio
+        });
+        return Json(resultado);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[BuscarDisponibles] Error: {ex.Message}");
+        return Json(new List<object>());
+      }
     }
   }
 }

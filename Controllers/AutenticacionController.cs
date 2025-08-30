@@ -13,44 +13,69 @@ namespace inmobiliaria.Controllers
     [HttpGet]
     public IActionResult Login()
     {
-      if (User.Identity != null && User.Identity.IsAuthenticated)
+      try
       {
-        return Redirect("/panel");
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+          return Redirect("/panel");
+        }
+        return View();
       }
-      return View();
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Login GET] Error: {ex.Message}");
+        return View();
+      }
     }
 
     // POST: /autenticacion/login
     [HttpPost]
     public async Task<IActionResult> Login(string email, string contrasena)
     {
-      var usuario = _usuarioDao.Login(email, contrasena);
-      if (usuario != null)
+      try
       {
-        var claims = new List<Claim>
+        var usuario = _usuarioDao.Login(email, contrasena);
+        if (usuario != null)
         {
-          new(ClaimTypes.Name, usuario.Email),
-          new(ClaimTypes.Role, usuario.Rol),
-          new("Id", usuario.IdUsuario.ToString()),
-          new(ClaimTypes.GivenName, usuario.Nombre),
-          new(ClaimTypes.Surname, usuario.Apellido),
-          new("Avatar", usuario.Avatar ?? "")
-        };
-        var claimsIdentity = new ClaimsIdentity(claims, "authCookie");
-        await HttpContext.SignInAsync("authCookie", new ClaimsPrincipal(claimsIdentity));
+          var claims = new List<Claim>
+          {
+            new(ClaimTypes.Name, usuario.Email),
+            new(ClaimTypes.Role, usuario.Rol),
+            new("Id", usuario.IdUsuario.ToString()),
+            new(ClaimTypes.GivenName, usuario.Nombre),
+            new(ClaimTypes.Surname, usuario.Apellido),
+            new("Avatar", usuario.Avatar ?? "")
+          };
+          var claimsIdentity = new ClaimsIdentity(claims, "authCookie");
+          await HttpContext.SignInAsync("authCookie", new ClaimsPrincipal(claimsIdentity));
 
-        return Redirect("/panel");
+          return Redirect("/panel");
+        }
+        ViewBag.Mensaje = "Login inválido";
+        return View();
       }
-      ViewBag.Mensaje = "Login inválido";
-      return View();
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Login POST] Error: {ex.Message}");
+        ViewBag.Mensaje = "Error en login";
+        return View();
+      }
     }
 
     // POST: /autenticacion/salir
     [HttpPost]
     public async Task<IActionResult> Salir()
     {
-      await HttpContext.SignOutAsync("authCookie");
-      return RedirectToAction("Login", "Autenticacion");
+      try
+      {
+        await HttpContext.SignOutAsync("authCookie");
+        return RedirectToAction("Login", "Autenticacion");
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Salir] Error: {ex.Message}");
+        return RedirectToAction("Login", "Autenticacion");
+      }
     }
   }
 }

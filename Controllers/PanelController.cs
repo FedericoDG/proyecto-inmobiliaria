@@ -18,6 +18,7 @@ namespace inmobiliaria.Controllers
 
         // GET: /panel
         [Authorize]
+        // GET: /panel
         public IActionResult Index()
         {
             return View();

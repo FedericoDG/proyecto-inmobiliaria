@@ -15,36 +15,100 @@ namespace inmobiliaria.Repositories
 
         public List<Inmueble> ObtenerTodos()
         {
-            var lista = new List<Inmueble>();
-            using var conn = Conexion.ObtenerConexion(_connectionString);
-            using var cmd = new MySqlCommand("SELECT * FROM inmuebles WHERE activo = 1", conn);
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            try
             {
-                lista.Add(MapearInmueble(reader));
+                var lista = new List<Inmueble>();
+                using var conn = Conexion.ObtenerConexion(_connectionString);
+                using var cmd = new MySqlCommand("SELECT * FROM inmuebles WHERE activo = 1", conn);
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(MapearInmueble(reader));
+                }
+                return lista;
             }
-            return lista;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return new List<Inmueble>();
+            }
         }
 
-        public List<Inmueble> ObtenerPaginados(int page, int pageSize)
+
+        public List<Inmueble> ObtenerPaginadosPorEstado(int page, int pageSize, string? estado)
         {
-            var lista = new List<Inmueble>();
-            using var conn = Conexion.ObtenerConexion(_connectionString);
-            using var cmd = new MySqlCommand(@"SELECT * FROM inmuebles WHERE activo = 1 LIMIT @limit OFFSET @offset", conn);
-            cmd.Parameters.AddWithValue("@limit", pageSize);
-            cmd.Parameters.AddWithValue("@offset", (page - 1) * pageSize);
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            try
             {
-                lista.Add(MapearInmueble(reader));
+                var lista = new List<Inmueble>();
+                using var conn = Conexion.ObtenerConexion(_connectionString);
+                string sql = "SELECT * FROM inmuebles WHERE activo = 1";
+                if (!string.IsNullOrEmpty(estado))
+                    sql += " AND estado = @estado";
+                sql += " LIMIT @limit OFFSET @offset";
+                using var cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@limit", pageSize);
+                cmd.Parameters.AddWithValue("@offset", (page - 1) * pageSize);
+                if (!string.IsNullOrEmpty(estado))
+                    cmd.Parameters.AddWithValue("@estado", estado);
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(MapearInmueble(reader));
+                }
+                return lista;
             }
-            return lista;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return [];
+            }
+        }
+
+        public List<Inmueble> ObtenerPaginadosPorPropietarioYEstado(int page, int pageSize, int? propietarioId, string? estado)
+        {
+            try
+            {
+                var lista = new List<Inmueble>();
+                using var conn = Conexion.ObtenerConexion(_connectionString);
+                string sql = "SELECT * FROM inmuebles WHERE activo = 1";
+                if (propietarioId != null)
+                    sql += " AND id_propietario = @propietarioId";
+                if (!string.IsNullOrEmpty(estado))
+                    sql += " AND estado = @estado";
+                sql += " LIMIT @limit OFFSET @offset";
+                using var cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@limit", pageSize);
+                cmd.Parameters.AddWithValue("@offset", (page - 1) * pageSize);
+                if (propietarioId != null)
+                    cmd.Parameters.AddWithValue("@propietarioId", propietarioId);
+                if (!string.IsNullOrEmpty(estado))
+                    cmd.Parameters.AddWithValue("@estado", estado);
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(MapearInmueble(reader));
+                }
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return [];
+            }
         }
         public int ContarInmuebles()
         {
-            using var conn = Conexion.ObtenerConexion(_connectionString);
-            using var cmd = new MySqlCommand("SELECT COUNT(*) FROM inmuebles WHERE activo = 1", conn);
-            return Convert.ToInt32(cmd.ExecuteScalar());
+            try
+            {
+                using var conn = Conexion.ObtenerConexion(_connectionString);
+                using var cmd = new MySqlCommand("SELECT COUNT(*) FROM inmuebles WHERE activo = 1", conn);
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return 0;
+            }
         }
 
         public Inmueble? ObtenerPorId(int id)
@@ -116,10 +180,9 @@ namespace inmobiliaria.Repositories
         public void ActualizarEstado(int idInmueble, string nuevoEstado)
         {
             Console.WriteLine($"ActualizarEstado llamado con idInmueble={idInmueble}, nuevoEstado={nuevoEstado}");
-            using var connection = new MySqlConnection(_connectionString);
-            connection.Open();
+            using var conn = Conexion.ObtenerConexion(_connectionString);
             var query = "UPDATE inmuebles SET estado = @estado WHERE id_inmueble = @idInmueble";
-            using var command = new MySqlCommand(query, connection);
+            using var command = new MySqlCommand(query, conn);
             command.Parameters.AddWithValue("@estado", nuevoEstado);
             command.Parameters.AddWithValue("@idInmueble", idInmueble);
             command.ExecuteNonQuery();
@@ -130,50 +193,47 @@ namespace inmobiliaria.Repositories
             var lista = new List<Inmueble>();
             try
             {
-                using (var connection = new MySqlConnection(_connectionString))
-                {
-                    connection.Open();
-                    var query = @"SELECT * FROM inmuebles WHERE activo = 1"
-                        + (idTipo == null ? "" : " AND id_tipo = @idTipo")
-                        + (string.IsNullOrEmpty(uso) ? "" : " AND uso = @uso")
-                        + (ambientes == null ? "" : " AND cantidad_ambientes = @ambientes")
-                        + (precioMax == null ? "" : " AND precio <= @precioMax");
+                using var conn = Conexion.ObtenerConexion(_connectionString);
+                var query = @"SELECT * FROM inmuebles WHERE activo = 1"
+                    + (idTipo == null ? "" : " AND id_tipo = @idTipo")
+                    + (string.IsNullOrEmpty(uso) ? "" : " AND uso = @uso")
+                    + (ambientes == null ? "" : " AND cantidad_ambientes = @ambientes")
+                    + (precioMax == null ? "" : " AND precio <= @precioMax");
 
-                    // Si las fechas están presentes, filtrar inmuebles ocupados en ese rango
-                    if (fechaInicio != null && fechaFin != null)
-                    {
-                        query += @" AND NOT EXISTS (
+                // Si las fechas están presentes, filtrar inmuebles ocupados en ese rango
+                if (fechaInicio != null && fechaFin != null)
+                {
+                    query += @" AND NOT EXISTS (
                                 SELECT 1 FROM contratos c
                                 WHERE c.id_inmueble = inmuebles.id_inmueble
                                   AND NOT (c.fecha_fin_original < @fechaInicio OR c.fecha_inicio > @fechaFin)
                             )";
-                    }
+                }
 
-                    using var command = new MySqlCommand(query, connection);
-                    if (idTipo != null)
-                        command.Parameters.AddWithValue("@idTipo", idTipo);
-                    if (!string.IsNullOrEmpty(uso))
-                        command.Parameters.AddWithValue("@uso", uso);
-                    if (ambientes != null)
-                        command.Parameters.AddWithValue("@ambientes", ambientes);
-                    if (precioMax != null)
-                        command.Parameters.AddWithValue("@precioMax", precioMax);
-                    if (fechaInicio != null && fechaFin != null)
-                    {
-                        command.Parameters.AddWithValue("@fechaInicio", fechaInicio.Value.ToString("yyyy-MM-dd"));
-                        command.Parameters.AddWithValue("@fechaFin", fechaFin.Value.ToString("yyyy-MM-dd"));
-                    }
-                    // Imprimir la query y los valores de los parámetros
-                    Console.WriteLine($"BuscarDisponibles SQL: {query}");
-                    foreach (MySqlParameter p in command.Parameters)
-                    {
-                        Console.WriteLine($"  Param: {p.ParameterName} = {p.Value}");
-                    }
-                    using var reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        lista.Add(MapearInmueble(reader));
-                    }
+                using var command = new MySqlCommand(query, conn);
+                if (idTipo != null)
+                    command.Parameters.AddWithValue("@idTipo", idTipo);
+                if (!string.IsNullOrEmpty(uso))
+                    command.Parameters.AddWithValue("@uso", uso);
+                if (ambientes != null)
+                    command.Parameters.AddWithValue("@ambientes", ambientes);
+                if (precioMax != null)
+                    command.Parameters.AddWithValue("@precioMax", precioMax);
+                if (fechaInicio != null && fechaFin != null)
+                {
+                    command.Parameters.AddWithValue("@fechaInicio", fechaInicio.Value.ToString("yyyy-MM-dd"));
+                    command.Parameters.AddWithValue("@fechaFin", fechaFin.Value.ToString("yyyy-MM-dd"));
+                }
+                // Imprimir la query y los valores de los parámetros
+                Console.WriteLine($"BuscarDisponibles SQL: {query}");
+                foreach (MySqlParameter p in command.Parameters)
+                {
+                    Console.WriteLine($"  Param: {p.ParameterName} = {p.Value}");
+                }
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(MapearInmueble(reader));
                 }
             }
             catch (Exception ex)

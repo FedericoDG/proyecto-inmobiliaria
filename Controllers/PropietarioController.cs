@@ -14,75 +14,116 @@ namespace inmobiliaria.Controllers
     [HttpGet("")]
     public IActionResult Index(int page = 1, int pageSize = PaginacionConfig.PageSizeDefault)
     {
-      var total = _propietarioDao.ContarPropietarios();
-      var propietarios = _propietarioDao.ObtenerPaginados(page, pageSize);
+      try
+      {
+        var total = _propietarioDao.ContarPropietarios();
+        var propietarios = _propietarioDao.ObtenerPaginados(page, pageSize);
 
-      ViewBag.Page = page;
-      ViewBag.PageSize = pageSize;
-      ViewBag.Total = total;
-      ViewBag.TotalPages = (int)Math.Ceiling((double)total / pageSize);
+        ViewBag.Page = page;
+        ViewBag.PageSize = pageSize;
+        ViewBag.Total = total;
+        ViewBag.TotalPages = (int)Math.Ceiling((double)total / pageSize);
 
-      return View(propietarios);
+        return View(propietarios);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Index] Error: {ex.Message}");
+        return View(new List<Propietario>());
+      }
     }
 
+    // GET: /panel/propietarios/buscar-por-dni
     [HttpGet("buscar-por-dni")]
     public IActionResult BuscarPorDni(string dni)
     {
-      var propietarios = _propietarioDao.BuscarPorDni(dni);
-      var resultado = propietarios.Select(p => new { idPropietario = p.IdPropietario, nombre = p.Nombre, apellido = p.Apellido, dni = p.Dni }).ToList();
-      return Json(resultado);
+      try
+      {
+        var propietarios = _propietarioDao.BuscarPorDni(dni);
+        var resultado = propietarios.Select(p => new { idPropietario = p.IdPropietario, nombre = p.Nombre, apellido = p.Apellido, dni = p.Dni }).ToList();
+        return Json(resultado);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[BuscarPorDni] Error: {ex.Message}");
+        return Json(new List<object>());
+      }
     }
-
-    // GET: /panel/propietarios
-    // [HttpGet("")]
-    // public IActionResult Index()
-    // {
-    //   var propietarios = _propietarioDao.ObtenerTodos();
-    //   return View(propietarios);
-    // }
 
     // GET: /panel/propietarios/crear
     [HttpGet("crear")]
     public IActionResult Crear()
     {
-      return View();
+      try
+      {
+        return View();
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Crear GET] Error: {ex.Message}");
+        return View();
+      }
     }
 
     // POST: /panel/propietarios/crear
     [HttpPost("crear")]
     public IActionResult Crear(Propietario propietario)
     {
-      if (ModelState.IsValid)
+      try
       {
-        _propietarioDao.CrearPropietario(propietario);
-        TempData["Mensaje"] = "Propietario creado correctamente.";
-        return RedirectToAction("Index");
+        if (ModelState.IsValid)
+        {
+          _propietarioDao.CrearPropietario(propietario);
+          TempData["Mensaje"] = "Propietario creado correctamente.";
+          return RedirectToAction("Index");
+        }
+        return View(propietario);
       }
-      return View(propietario);
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Crear POST] Error: {ex.Message}");
+        return View(propietario);
+      }
     }
 
     // GET: /panel/propietarios/editar/{id}
     [HttpGet("editar/{id}")]
     public IActionResult Editar(int id)
     {
-      var propietario = _propietarioDao.ObtenerPorId(id);
-      if (propietario == null)
+      try
+      {
+        var propietario = _propietarioDao.ObtenerPorId(id);
+        if (propietario == null)
+          return NotFound();
+        return View(propietario);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Editar GET] Error: {ex.Message}");
         return NotFound();
-      return View(propietario);
+      }
     }
 
     // POST: /panel/propietarios/editar/{id}
     [HttpPost("editar/{id}")]
     public IActionResult Editar(int id, Propietario propietario)
     {
-      if (ModelState.IsValid)
+      try
       {
-        propietario.IdPropietario = id;
-        _propietarioDao.ActualizarPropietario(propietario);
-        TempData["Mensaje"] = "Propietario editado correctamente.";
-        return RedirectToAction("Index");
+        if (ModelState.IsValid)
+        {
+          propietario.IdPropietario = id;
+          _propietarioDao.ActualizarPropietario(propietario);
+          TempData["Mensaje"] = "Propietario editado correctamente.";
+          return RedirectToAction("Index");
+        }
+        return View(propietario);
       }
-      return View(propietario);
+      catch (Exception ex)
+      {
+        Console.WriteLine($"[Editar POST] Error: {ex.Message}");
+        return View(propietario);
+      }
     }
 
     // POST: /panel/propietarios/eliminar/{id}

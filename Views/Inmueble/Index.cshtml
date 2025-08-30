@@ -41,6 +41,59 @@
     </div>
 </div>
 
+
+
+<div class="d-flex justify-content-end mb-3">
+    <form method="get" class="bg-white border rounded shadow-sm p-3" style="max-width: 300px; min-width: 220px;">
+        @{
+            var estadoSeleccionado = Context.Request.Query["estado"].ToString();
+            var propietarioId = Context.Request.Query["propietarioId"].ToString();
+        }
+        @if (!string.IsNullOrEmpty(propietarioId))
+        {
+            <input type="hidden" name="propietarioId" value="@propietarioId" />
+        }
+        <label for="estado" class="form-label fw-bold mb-2">Filtrar por estado:</label>
+        <div class="input-group">
+            <select id="estado" name="estado" class="form-select form-select-sm">
+                @if (string.IsNullOrEmpty(estadoSeleccionado))
+                {
+                    <option value="" selected>Todos los estados</option>
+                }
+                else
+                {
+                    <option value="">Todos los estados</option>
+                }
+                @if (estadoSeleccionado == "disponible")
+                {
+                    <option value="disponible" selected>Disponible</option>
+                }
+                else
+                {
+                    <option value="disponible">Disponible</option>
+                }
+                @if (estadoSeleccionado == "suspendido")
+                {
+                    <option value="suspendido" selected>Suspendido</option>
+                }
+                else
+                {
+                    <option value="suspendido">Suspendido</option>
+                }
+                @if (estadoSeleccionado == "ocupado")
+                {
+                    <option value="ocupado" selected>Ocupado</option>
+                }
+                else
+                {
+                    <option value="ocupado">Ocupado</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm ms-2">Filtrar</button>
+        </div>
+    </form>
+</div>
+
 <table class="table table-striped">
     <thead>
         <tr class="table-primary">
@@ -84,6 +137,10 @@
                         title="Editar">
                         <i class="bi bi-pencil-square"></i>
                     </a>
+                    <a class="btn btn-outline-info btn-sm me-1" href="/panel/contratos?inmuebleId=@inm.IdInmueble"
+                        title="Ver contratos de este inmueble">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </a>
                     <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
                         data-bs-target="#modalEliminar" data-id="@inm.IdInmueble" data-nombre="@inm.Direccion"
                         title="Eliminar">
@@ -93,24 +150,24 @@
             </tr>
         }
     </tbody>
-
 </table>
 
 <nav aria-label="Paginación"></nav>
 <ul class="pagination justify-content-center">
     <li class="page-item @(ViewBag.Page <= 1 ? "disabled" : "")">
-        <a class="page-link" href="?page=@(ViewBag.Page - 1)&pageSize=@ViewBag.PageSize">Anterior</a>
+        <a class="page-link"
+            href="?page=@(ViewBag.Page - 1)&pageSize=@ViewBag.PageSize@(ViewBag.EstadoSeleccionado != null ? "&estado=" + ViewBag.EstadoSeleccionado : "")@(ViewBag.PropietarioId != null ? "&propietarioId=" + ViewBag.PropietarioId : "")">Anterior</a>
     </li>
-
     @for (int i = 1; i <= ViewBag.TotalPages; i++)
     {
         <li class="page-item @(i == ViewBag.Page ? "active" : "")">
-            <a class="page-link" href="?page=@i&pageSize=@ViewBag.PageSize">@i</a>
+            <a class="page-link"
+                href="?page=@i&pageSize=@ViewBag.PageSize@(ViewBag.EstadoSeleccionado != null ? "&estado=" + ViewBag.EstadoSeleccionado : "")@(ViewBag.PropietarioId != null ? "&propietarioId=" + ViewBag.PropietarioId : "")">@i</a>
         </li>
     }
-
     <li class="page-item @(ViewBag.Page >= ViewBag.TotalPages ? "disabled" : "")">
-        <a class="page-link" href="?page=@(ViewBag.Page + 1)&pageSize=@ViewBag.PageSize">Siguiente</a>
+        <a class="page-link"
+            href="?page=@(ViewBag.Page + 1)&pageSize=@ViewBag.PageSize@(ViewBag.EstadoSeleccionado != null ? "&estado=" + ViewBag.EstadoSeleccionado : "")@(ViewBag.PropietarioId != null ? "&propietarioId=" + ViewBag.PropietarioId : "")">Siguiente</a>
     </li>
 </ul>
 </nav>

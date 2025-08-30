@@ -10,78 +10,120 @@ namespace inmobiliaria.Controllers
     {
         private readonly InquilinoDao _inquilinoDao = new(config.GetConnectionString("MySqlConnection")!);
 
-        // GET: /panel/inquilinos
-        // [HttpGet("")]
-        // public IActionResult Index()
-        // {
-        //     var inquilinos = _inquilinoDao.ObtenerTodos();
-        //     return View(inquilinos);
-        // }
         // GET: /panel/inquilinos?page=1&pageSize=5
         [HttpGet("")]
         public IActionResult Index(int page = 1, int pageSize = PaginacionConfig.PageSizeDefault)
         {
-            var total = _inquilinoDao.ContarInquilinos();
-            var inquilinos = _inquilinoDao.ObtenerPaginados(page, pageSize);
+            try
+            {
+                var total = _inquilinoDao.ContarInquilinos();
+                var inquilinos = _inquilinoDao.ObtenerPaginados(page, pageSize);
 
-            ViewBag.Page = page;
-            ViewBag.PageSize = pageSize;
-            ViewBag.Total = total;
-            ViewBag.TotalPages = (int)Math.Ceiling((double)total / pageSize);
+                ViewBag.Page = page;
+                ViewBag.PageSize = pageSize;
+                ViewBag.Total = total;
+                ViewBag.TotalPages = (int)Math.Ceiling((double)total / pageSize);
 
-            return View(inquilinos);
+                return View(inquilinos);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Index] Error: {ex.Message}");
+                return View(new List<Inquilino>());
+            }
         }
 
+        // GET: /panel/inquilinos/buscar-por-dni
         [HttpGet("buscar-por-dni")]
         public IActionResult BuscarPorDni(string dni)
         {
-            var inquilinos = _inquilinoDao.BuscarPorDni(dni);
-            var resultado = inquilinos.Select(i => new { idInquilino = i.IdInquilino, nombre = i.Nombre, apellido = i.Apellido, dni = i.Dni }).ToList();
-            return Json(resultado);
+            try
+            {
+                var inquilinos = _inquilinoDao.BuscarPorDni(dni);
+                var resultado = inquilinos.Select(i => new { idInquilino = i.IdInquilino, nombre = i.Nombre, apellido = i.Apellido, dni = i.Dni }).ToList();
+                return Json(resultado);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[BuscarPorDni] Error: {ex.Message}");
+                return Json(new List<object>());
+            }
         }
 
         // GET: /panel/inquilinos/crear
         [HttpGet("crear")]
         public IActionResult Crear()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Crear GET] Error: {ex.Message}");
+                return View();
+            }
         }
 
         // POST: /panel/inquilinos/crear
         [HttpPost("crear")]
         public IActionResult Crear(Inquilino inquilino)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _inquilinoDao.CrearInquilino(inquilino);
-                TempData["Mensaje"] = "Inquilino creado correctamente.";
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    _inquilinoDao.CrearInquilino(inquilino);
+                    TempData["Mensaje"] = "Inquilino creado correctamente.";
+                    return RedirectToAction("Index");
+                }
+                return View(inquilino);
             }
-            return View(inquilino);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Crear POST] Error: {ex.Message}");
+                return View(inquilino);
+            }
         }
 
         // GET: /panel/inquilinos/editar/{id}
         [HttpGet("editar/{id}")]
         public IActionResult Editar(int id)
         {
-            var inquilino = _inquilinoDao.ObtenerPorId(id);
-            if (inquilino == null)
+            try
+            {
+                var inquilino = _inquilinoDao.ObtenerPorId(id);
+                if (inquilino == null)
+                    return NotFound();
+                return View(inquilino);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Editar GET] Error: {ex.Message}");
                 return NotFound();
-            return View(inquilino);
+            }
         }
 
         // POST: /panel/inquilinos/editar/{id}
         [HttpPost("editar/{id}")]
         public IActionResult Editar(int id, Inquilino inquilino)
         {
-            if (ModelState.IsValid)
+            try
             {
-                inquilino.IdInquilino = id;
-                _inquilinoDao.ActualizarInquilino(inquilino);
-                TempData["Mensaje"] = "Inquilino editado correctamente.";
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    inquilino.IdInquilino = id;
+                    _inquilinoDao.ActualizarInquilino(inquilino);
+                    TempData["Mensaje"] = "Inquilino editado correctamente.";
+                    return RedirectToAction("Index");
+                }
+                return View(inquilino);
             }
-            return View(inquilino);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Editar POST] Error: {ex.Message}");
+                return View(inquilino);
+            }
         }
 
         // POST: /panel/inquilinos/eliminar/{id}

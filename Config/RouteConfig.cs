@@ -82,11 +82,17 @@ namespace inmobiliaria.Config
                 defaults: new { controller = "Pago", action = "Index" })
                 .WithStaticAssets();
 
-            // Ruta para el perfil de usuario en el panel
+            // Rutas personalizadas para usuarios
             app.MapControllerRoute(
-                name: "panel_perfil",
-                pattern: "panel/perfil",
-                defaults: new { controller = "Panel", action = "Perfil" })
+                name: "panel_usuarios_detalle",
+                pattern: "panel/usuarios/{id}",
+                defaults: new { controller = "Panel", action = "Usuario" })
+                .WithStaticAssets();
+
+            app.MapControllerRoute(
+                name: "panel_usuarios_lista",
+                pattern: "panel/usuarios",
+                defaults: new { controller = "Panel", action = "Usuarios" })
                 .WithStaticAssets();
 
             // Ruta para el panel principal
@@ -95,6 +101,13 @@ namespace inmobiliaria.Config
                 pattern: "panel",
                 defaults: new { controller = "Panel", action = "Index" })
                 .WithStaticAssets();
+
+            app.MapControllerRoute(
+                name: "panel_perfil",
+                pattern: "panel/perfil",
+                defaults: new { controller = "Panel", action = "Perfil" })
+                .WithStaticAssets();
+
 
             // Ruta por defecto para el resto de controladores y acciones
             app.MapControllerRoute(

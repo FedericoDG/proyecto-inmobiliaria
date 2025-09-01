@@ -19,9 +19,10 @@
                 var nombre = Model.Nombre ?? "Usuario";
                 var apellido = Model.Apellido ?? "";
                 var nombreApellido = $"{nombre} {apellido}".Trim();
-                var avatarUrl = !string.IsNullOrEmpty(Model.Avatar)
-                ? Model.Avatar
-                : $"https://ui-avatars.com/api/?name={nombreApellido}&background=0D8ABC&color=fff&size=100";
+                var avatarClaim = User.FindFirst("Avatar")?.Value;
+                var avatarUrl = !string.IsNullOrEmpty(avatarClaim)
+                ? (avatarClaim.StartsWith("/img/") ? avatarClaim + "?v=" + Guid.NewGuid() : avatarClaim)
+                : $"https://ui-avatars.com/api/?name={nombreApellido}&background=0D8ABC&color=fff&size=32";
               }
               <img src="@avatarUrl" alt="Avatar" class="rounded-circle shadow" style="width: 100px; height: 100px;">
             </div>

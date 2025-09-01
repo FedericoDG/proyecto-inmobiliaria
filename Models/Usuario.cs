@@ -14,7 +14,6 @@ namespace inmobiliaria.Models
         [Column("email")]
         public string Email { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(255)]
         [Column("contrasena")]
         public string Contrasena { get; set; } = string.Empty;

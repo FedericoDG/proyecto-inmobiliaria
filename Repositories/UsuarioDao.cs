@@ -72,7 +72,7 @@ namespace inmobiliaria.Repositories
             {
                 var lista = new List<Usuario>();
                 using var conn = Conexion.ObtenerConexion(_connectionString);
-                var cmd = new MySqlCommand("SELECT * FROM usuarios WHERE activo = 1", conn);
+                var cmd = new MySqlCommand("SELECT * FROM usuarios", conn);
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {

@@ -1,0 +1,53 @@
+@* Layout para autenticación *@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"] - Autenticación</title>
+  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <style>
+    .navbar-gradient {
+      background: linear-gradient(90deg, #0d6efd 0%, #003366 100%);
+    }
+
+    .footer-gradient {
+      background: linear-gradient(90deg, #003366 0%, #0d6efd 100%);
+    }
+  </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-gradient shadow-sm">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="/panel">
+          <i class="bi bi-building fs-3"></i>
+          <span class="fw-bold">Inmobiliaria</span>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="flex-fill container mt-4 mb-4">
+    @RenderBody()
+  </main>
+
+  <footer class="footer mt-auto py-3 text-white shadow-sm footer-gradient">
+    <div class="container">
+      <div class="d-flex justify-content-center align-items-center gap-2">
+        <span class="fw-semibold">Alumno: Federico González (DNI: 28126367)</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="~/lib/jquery/dist/jquery.min.js"></script>
+  <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

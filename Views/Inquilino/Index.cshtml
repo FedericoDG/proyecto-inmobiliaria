@@ -61,11 +61,14 @@
                                 title="Editar">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
-                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#modalEliminar" data-id="@i.IdInquilino" data-nombre="@i.Nombre @i.Apellido"
-                                title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                            @if (User.IsInRole("administrador"))
+                            {
+                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#modalEliminar" data-id="@i.IdInquilino" data-nombre="@i.Nombre @i.Apellido"
+                                    title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            }
                         </td>
                     </tr>
                 }

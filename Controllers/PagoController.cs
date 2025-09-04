@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using inmobiliaria.Models;
 using inmobiliaria.Repositories;
 using inmobiliaria.Config;
+using Microsoft.AspNetCore.Authorization;
 
 namespace inmobiliaria.Controllers
 {
@@ -147,6 +148,7 @@ namespace inmobiliaria.Controllers
     }
 
     // POST: /panel/pagos/anular/{id}
+    [Authorize(Roles = "administrador")]
     [HttpPost("anular/{id}")]
     public IActionResult Anular(int id)
     {

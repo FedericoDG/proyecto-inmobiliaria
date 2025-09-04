@@ -5,13 +5,9 @@ using inmobiliaria.Data;
 
 namespace inmobiliaria.Repositories
 {
-  public class ContratoDao
+  public class ContratoDao(string connectionString)
   {
-    private readonly string _connectionString;
-    public ContratoDao(string connectionString)
-    {
-      _connectionString = connectionString;
-    }
+    private readonly string _connectionString = connectionString;
 
     public int ContarContratosVigentesPorFechas(DateTime desde, DateTime hasta)
     {
@@ -99,7 +95,7 @@ namespace inmobiliaria.Repositories
       catch (Exception ex)
       {
         Console.WriteLine(ex);
-        return new List<Contrato>();
+        return [];
       }
     }
 

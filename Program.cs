@@ -42,7 +42,7 @@ RouteConfig.UseCustomRoutes(app);
 app.Use(async (context, next) =>
 {
     await next();
-    if (context.Response.StatusCode == 404 && !context.Response.HasStarted)
+    if (context.Response.StatusCode == 401 && !context.Response.HasStarted)
     {
         context.Response.Redirect("/Error404");
     }

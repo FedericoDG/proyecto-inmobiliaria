@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using inmobiliaria.Models;
 using inmobiliaria.Repositories;
 using inmobiliaria.Config;
@@ -287,6 +288,7 @@ namespace inmobiliaria.Controllers
     }
 
     // POST: /panel/contratos/rescindir
+    [Authorize(Roles = "administrador")]
     [HttpPost("rescindir")]
     public IActionResult Rescindir(int IdContrato, DateTime FechaFinAnticipada, decimal MontoMensualRescision, decimal Multa)
     {

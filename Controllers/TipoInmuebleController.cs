@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using inmobiliaria.Models;
 using inmobiliaria.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace inmobiliaria.Controllers
 {
@@ -102,6 +103,7 @@ namespace inmobiliaria.Controllers
     }
 
     // POST: /panel/tipos-inmueble/eliminar/{id}
+    [Authorize(Roles = "administrador")]
     [HttpPost("eliminar/{id}")]
     public IActionResult EliminarConfirmado(int id)
     {

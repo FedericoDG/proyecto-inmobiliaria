@@ -65,11 +65,14 @@
                                 href="/panel/inmuebles?propietarioId=@p.IdPropietario" title="Ver inmuebles">
                                 <i class="bi bi-house-door-fill"></i>
                             </a>
-                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#modalEliminar" data-id="@p.IdPropietario"
-                                data-nombre="@p.Nombre @p.Apellido" title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                            @if (User.IsInRole("administrador"))
+                            {
+                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#modalEliminar" data-id="@p.IdPropietario"
+                                    data-nombre="@p.Nombre @p.Apellido" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            }
                         </td>
                     </tr>
                 }

@@ -174,11 +174,15 @@
                         title="Ver contratos de este inmueble">
                         <i class="bi bi-file-earmark-text"></i>
                     </a>
-                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#modalEliminar" data-id="@inm.IdInmueble" data-nombre="@inm.Direccion"
-                        title="Eliminar">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    @if (User.IsInRole("administrador"))
+                    {
+
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#modalEliminar" data-id="@inm.IdInmueble" data-nombre="@inm.Direccion"
+                            title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
                 </td>
             </tr>
         }

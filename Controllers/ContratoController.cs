@@ -142,8 +142,10 @@ namespace inmobiliaria.Controllers
     {
       try
       {
-        Console.WriteLine($"contrato.IdInquilino: {contrato.IdInquilino}");
-        Console.WriteLine($"contrato.IdInmueble: {contrato.IdInmueble}");
+        // Calcular cantidad de cuotas mensuales
+        var cantDePagos = ((contrato.FechaFinOriginal.Year - contrato.FechaInicio.Year) * 12) + (contrato.FechaFinOriginal.Month - contrato.FechaInicio.Month);
+        Console.WriteLine($"Cantidad de cuotas mensuales: {cantDePagos}");
+
         // Asignar el usuario logueado como creador
         var idUsuario = int.Parse(User.FindFirst("Id")!.Value);
         contrato.IdUsuarioCreador = idUsuario;
@@ -151,7 +153,15 @@ namespace inmobiliaria.Controllers
         contrato.Estado = "vigente";
         if (ModelState.IsValid)
         {
-          _contratoDao.CrearContrato(contrato);
+          var idContratoCreado = _contratoDao.CrearContrato(contrato);
+          var idUsuarioLoagueado = int.Parse(User.FindFirst("Id")!.Value);
+
+          // Crear los pagos pendientes asociados al contrato
+          if (contrato.MontoMensual.HasValue)
+          {
+            _pagoDao.CrearPagosPendientes(idContratoCreado, contrato.FechaInicio, cantDePagos, contrato.MontoMensual.Value, idUsuarioLoagueado);
+          }
+
           // Actualizar estado del inmueble a 'ocupado' de forma simple
           _inmuebleDao.ActualizarEstado((int)contrato.IdInmueble!, "ocupado");
           TempData["Mensaje"] = "Contrato creado correctamente.";
@@ -248,7 +258,6 @@ namespace inmobiliaria.Controllers
       try
       {
         var idUsuario = int.Parse(User.FindFirst("Id")!.Value);
-        // TODO: Puede ser nulo
         int idContratoAnterior = int.Parse(Request.Form["IdContratoAnterior"]); // TODO: Manejar nulo
         var contratoAnterior = _contratoDao.ObtenerPorId(idContratoAnterior);
 
@@ -295,7 +304,6 @@ namespace inmobiliaria.Controllers
       try
       {
         Console.WriteLine($"Rescindiendo contrato {IdContrato} con fecha {FechaFinAnticipada} y multa {Multa}");
-        // Rescindiendo (o eso se supone...)
         var contrato = _contratoDao.ObtenerPorId(IdContrato);
         if (contrato == null)
           return NotFound();
@@ -305,6 +313,25 @@ namespace inmobiliaria.Controllers
         contrato.Multa = Multa;
         contrato.IdUsuarioFinalizador = int.Parse(User.FindFirst("Id")!.Value);
         _contratoDao.RescindirContrato(contrato);
+
+        // Anular pagos pendientes desde la fecha de rescisión
+        _pagoDao.CancelarPagosPorContrato(IdContrato, FechaFinAnticipada);
+
+        // Crear un nuevo pago por la multa
+        if (Multa > 0)
+        {
+          var pagoMulta = new Pago
+          {
+            IdContrato = IdContrato,
+            NumeroPago = 0, // Indica que es una multa
+            FechaVencimiento = DateTime.Today,
+            Importe = Multa,
+            Detalle = "Multa por rescisión anticipada",
+            Estado = "pendiente",
+            IdUsuarioCreador = contrato.IdUsuarioCreador
+          };
+          _pagoDao.CrearPago(pagoMulta);
+        }
 
         // Inmueble pasa a estado disponible
         if (contrato.IdInmueble != null)

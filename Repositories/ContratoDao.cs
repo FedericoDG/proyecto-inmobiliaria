@@ -120,7 +120,7 @@ namespace inmobiliaria.Repositories
       catch (Exception ex)
       {
         Console.WriteLine(ex);
-        return new List<Contrato>();
+        return [];
       }
     }
 
@@ -149,7 +149,7 @@ namespace inmobiliaria.Repositories
       catch (Exception ex)
       {
         Console.WriteLine(ex);
-        return new List<Contrato>();
+        return [];
       }
     }
 
@@ -197,7 +197,7 @@ namespace inmobiliaria.Repositories
       }
     }
 
-    public bool CrearContrato(Contrato contrato)
+    public int CrearContrato(Contrato contrato)
     {
       try
       {
@@ -213,12 +213,18 @@ namespace inmobiliaria.Repositories
         cmd.Parameters.AddWithValue("@monto_mensual", contrato.MontoMensual);
         cmd.Parameters.AddWithValue("@estado", contrato.Estado ?? (object)DBNull.Value);
         cmd.Parameters.AddWithValue("@multa", contrato.Multa ?? (object)DBNull.Value);
-        return cmd.ExecuteNonQuery() > 0;
+        cmd.ExecuteNonQuery();
+
+        // 2. Obtener el ID generado
+        var idCmd = new MySqlCommand("SELECT LAST_INSERT_ID();", conn);
+        var id = Convert.ToInt32(idCmd.ExecuteScalar());
+        return id;
+
       }
       catch (Exception ex)
       {
         Console.WriteLine(ex);
-        return false;
+        return 0;
       }
     }
 

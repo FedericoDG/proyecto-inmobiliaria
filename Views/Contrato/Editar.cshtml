@@ -110,7 +110,8 @@
           </div>
           <div class="mb-3">
             <label for="Multa" class="form-label">Multa</label>
-            <input type="number" class="form-control" name="Multa" id="Multa" min="0" required />
+            <input type="number" class="form-control" name="Multa" id="Multa" min="0" required readonly />
+            <div id="resultadoMulta" class="mt-2 alert alert-info" style="display:none;"></div>
           </div>
           <div class="d-flex justify-content-end">
             <button type="submit" class="btn btn-danger">Confirmar rescisión</button>
@@ -158,4 +159,42 @@
 
 @section Scripts {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const fechaFinAnticipadaInput = document.getElementById('FechaFinAnticipada');
+      const multaInput = document.getElementById('Multa');
+      const fechaFinOriginal = '@Model.FechaFinOriginal.ToString("yyyy-MM-dd")';
+      const fechaInicio = '@Model.FechaInicio.ToString("yyyy-MM-dd")';
+      const montoMensual = parseFloat('@Model.MontoMensual');
+      const resultadoMulta = document.getElementById('resultadoMulta');
+
+      fechaFinAnticipadaInput.addEventListener('change', function () {
+        const fechaFinAnticipada = this.value;
+        if (!fechaFinAnticipada) {
+          resultadoMulta.style.display = 'none';
+          multaInput.value = '';
+          return;
+        }
+        const inicio = new Date(fechaInicio);
+        const finOriginal = new Date(fechaFinOriginal);
+        const finAnticipada = new Date(fechaFinAnticipada);
+        const mesesOriginal = (finOriginal.getFullYear() - inicio.getFullYear()) * 12 + (finOriginal.getMonth() - inicio.getMonth());
+        const mesesAnticipada = (finAnticipada.getFullYear() - inicio.getFullYear()) * 12 + (finAnticipada.getMonth() - inicio.getMonth());
+        const mitadContrato = Math.floor(mesesOriginal / 2);
+        let mensaje = '';
+        let multa = montoMensual;
+        if (mesesAnticipada >= mitadContrato) {
+          mensaje = 'Ha pasado más de la mitad del contrato: ' + mesesAnticipada + ' de ' + mesesOriginal + ' meses. La multa es un mes de contrato.';
+          resultadoMulta.className = 'mt-2 alert alert-success';
+        } else {
+          mensaje = 'Ha pasado menos de la mitad del contrato: ' + mesesAnticipada + ' de ' + mesesOriginal + ' meses. La multa es un mes de contrato.';
+          resultadoMulta.className = 'mt-2 alert alert-warning';
+          multa *= 2;
+        }
+        resultadoMulta.textContent = mensaje;
+        resultadoMulta.style.display = 'block';
+        multaInput.value = multa;
+      });
+    });
+  </script>
 }

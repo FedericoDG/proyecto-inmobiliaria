@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace inmobiliaria.Models
 {
     public class Pago
+
     {
         [Key]
         [Column("id_pago")]
@@ -18,6 +19,9 @@ namespace inmobiliaria.Models
         public int NumeroPago { get; set; }
 
         [Required]
+        [Column("fecha_vencimiento")]
+        public DateTime FechaVencimiento { get; set; }
+
         [Column("fecha_pago")]
         public DateTime FechaPago { get; set; }
 
@@ -30,7 +34,7 @@ namespace inmobiliaria.Models
         public decimal Importe { get; set; }
 
         [Column("estado")]
-        public string? Estado { get; set; } // Enum: activo, anulado
+        public string? Estado { get; set; } // Enum: pendiente, realizado, anulado
 
         [Required]
         [Column("id_usuario_creador")]
@@ -45,6 +49,7 @@ namespace inmobiliaria.Models
                    $"IdContrato: {IdContrato}, " +
                    $"NumeroPago: {NumeroPago}, " +
                    $"FechaPago: {FechaPago:yyyy-MM-dd}, " +
+                   $"FechaVencimiento: {FechaVencimiento:yyyy-MM-dd}, " +
                    $"Detalle: {Detalle}, " +
                    $"Importe: {Importe}, " +
                    $"Estado: {Estado}, " +

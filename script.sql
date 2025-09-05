@@ -27,23 +27,6 @@ CREATE TABLE `contratos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Estructura de tabla para la tabla `inmuebles`
---
-DROP TABLE IF EXISTS `inmuebles`;
-CREATE TABLE `inmuebles` (
-  `id_inmueble` int NOT NULL,
-  `id_propietario` int NOT NULL,
-  `id_tipo` int NOT NULL,
-  `uso` enum('residencial','comercial') COLLATE utf8mb4_general_ci NOT NULL,
-  `direccion` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `cantidad_ambientes` int DEFAULT NULL,
-  `coordenadas` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `precio` decimal(12,2) NOT NULL,
-  `estado` enum('disponible','suspendido','ocupado') COLLATE utf8mb4_general_ci DEFAULT 'disponible',
-  `activo` tinyint DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
 -- Estructura de tabla para la tabla `inquilinos`
 --
 DROP TABLE IF EXISTS `inquilinos`;
@@ -75,10 +58,11 @@ CREATE TABLE `pagos` (
   `id_pago` int NOT NULL,
   `id_contrato` int NOT NULL,
   `numero_pago` int NOT NULL,
-  `fecha_pago` date NOT NULL,
+  `fecha_vencimiento` date NOT NULL,
+  `fecha_pago` date DEFAULT NULL,
   `detalle` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `importe` decimal(12,2) NOT NULL,
-  `estado` enum('activo','anulado') COLLATE utf8mb4_general_ci DEFAULT 'activo',
+  `estado` enum('pendiente','realizado','anulado') COLLATE utf8mb4_general_ci DEFAULT 'pendiente',
   `id_usuario_creador` int NOT NULL,
   `id_usuario_anulador` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -151,6 +135,27 @@ INSERT INTO `usuarios` (`id_usuario`, `email`, `contrasena`, `nombre`, `apellido
 (2, 'usuario1@mail.com', 'AQAAAAIAAYagAAAAEAI7vDzjljLddAK4n9tI3jkvoi2qTG6x8M6xnZ4JMDi/tn/WLtyd/EVn2qJ6M8pzVA==', 'Blas', 'Haberland', 'empleado', NULL, '2025-08-17 18:56:00', '2025-08-19 15:53:57', 1),
 (3, 'usuario2@mail.com', 'AQAAAAIAAYagAAAAEAI7vDzjljLddAK4n9tI3jkvoi2qTG6x8M6xnZ4JMDi/tn/WLtyd/EVn2qJ6M8pzVA==', 'Facundo', 'Bacaicoa', 'empleado', NULL, '2025-08-17 19:02:11', '2025-08-19 15:54:01', 1);
 
+--
+-- Estructura de tabla para la tabla `inmuebles`
+--
+DROP TABLE IF EXISTS `inmuebles`;
+CREATE TABLE `inmuebles` (
+  `id_inmueble` int NOT NULL,
+  `id_propietario` int NOT NULL,
+  `id_tipo` int NOT NULL,
+  `uso` enum('residencial','comercial') COLLATE utf8mb4_general_ci NOT NULL,
+  `direccion` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `cantidad_ambientes` int DEFAULT NULL,
+  `coordenadas` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `precio` decimal(12,2) NOT NULL,
+  `estado` enum('disponible','suspendido','ocupado') COLLATE utf8mb4_general_ci DEFAULT 'disponible',
+  `activo` tinyint DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `inmuebles` (`id_inmueble`, `id_propietario`, `id_tipo`, `uso`, `direccion`, `cantidad_ambientes`, `coordenadas`, `precio`, `estado`, `activo`) VALUES
+(1, 2, 1, 'residencial', 'Calle Falsa 123', 2, '34.6037,-58.3816', 200000.00, 'disponible', 1),
+(2, 2, 1, 'residencial', 'Avenida Siempre Viva 742', 4, '34.6090,-58.3845', 175000.00, 'disponible', 1),
+(3, 3, 3, 'comercial', 'Boulevard Central 456', NULL, '34.6118,-58.4173', 1200000.00, 'disponible', 1);
 --
 -- Indices de la tabla `contratos`
 --

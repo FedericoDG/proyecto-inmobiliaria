@@ -84,15 +84,42 @@ namespace inmobiliaria.Repositories
         return null;
       }
     }
+    public void CrearPagosPendientes(int idContrato, DateTime fechaInicio, int cantidadPagos, decimal montoMensual, int idUsuarioCreador)
+    {
+      try
+      {
+        using var conn = Conexion.ObtenerConexion(_connectionString);
+        var fechaVencimiento = fechaInicio.AddDays(10); // Primer vencimiento 10 dias despues del inicio del contrato
+        for (int i = 1; i <= cantidadPagos; i++)
+        {
+          var cmd = new MySqlCommand(@"INSERT INTO pagos (id_contrato, numero_pago, fecha_vencimiento, detalle, importe, estado, id_usuario_creador) VALUES (@id_contrato, @numero_pago, @fecha_vencimiento, @detalle, @importe, @estado, @id_usuario_creador)", conn);
+          cmd.Parameters.AddWithValue("@id_contrato", idContrato);
+          cmd.Parameters.AddWithValue("@numero_pago", i);
+          cmd.Parameters.AddWithValue("@fecha_vencimiento", fechaVencimiento);
+          cmd.Parameters.AddWithValue("@detalle", DBNull.Value);
+          cmd.Parameters.AddWithValue("@importe", montoMensual);
+          cmd.Parameters.AddWithValue("@estado", "pendiente");
+          cmd.Parameters.AddWithValue("@id_usuario_creador", idUsuarioCreador);
+          cmd.ExecuteNonQuery();
+
+          // Para el siguiente vencimiento, avanzar al primer día del mes siguiente
+          fechaVencimiento = new DateTime(fechaVencimiento.Year, fechaVencimiento.Month, 1).AddMonths(1).AddDays(9);
+        }
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine(ex);
+      }
+    }
     public bool CrearPago(Pago pago)
     {
       try
       {
         using var conn = Conexion.ObtenerConexion(_connectionString);
-        var cmd = new MySqlCommand(@"INSERT INTO pagos (id_contrato, numero_pago, fecha_pago, detalle, importe, estado, id_usuario_creador, id_usuario_anulador) VALUES (@id_contrato, @numero_pago, @fecha_pago, @detalle, @importe, @estado, @id_usuario_creador, @id_usuario_anulador)", conn);
+        var cmd = new MySqlCommand(@"INSERT INTO pagos (id_contrato, numero_pago, fecha_vencimiento, detalle, importe, estado, id_usuario_creador, id_usuario_anulador) VALUES (@id_contrato, @numero_pago, @fecha_vencimiento, @detalle, @importe, @estado, @id_usuario_creador, @id_usuario_anulador)", conn);
         cmd.Parameters.AddWithValue("@id_contrato", pago.IdContrato);
         cmd.Parameters.AddWithValue("@numero_pago", pago.NumeroPago);
-        cmd.Parameters.AddWithValue("@fecha_pago", pago.FechaPago);
+        cmd.Parameters.AddWithValue("@fecha_vencimiento", pago.FechaVencimiento);
         cmd.Parameters.AddWithValue("@detalle", pago.Detalle ?? (object)DBNull.Value);
         cmd.Parameters.AddWithValue("@importe", pago.Importe);
         cmd.Parameters.AddWithValue("@estado", pago.Estado ?? (object)DBNull.Value);
@@ -110,6 +137,7 @@ namespace inmobiliaria.Repositories
     {
       try
       {
+        Console.WriteLine(pago); // llega como 0001-01-01
         using var conn = Conexion.ObtenerConexion(_connectionString);
         var cmd = new MySqlCommand(@"UPDATE pagos SET id_contrato = @id_contrato, numero_pago = @numero_pago, fecha_pago = @fecha_pago, detalle = @detalle, importe = @importe, estado = @estado, id_usuario_creador = @id_usuario_creador, id_usuario_anulador = @id_usuario_anulador WHERE id_pago = @id_pago", conn);
         cmd.Parameters.AddWithValue("@id_pago", pago.IdPago);
@@ -145,6 +173,15 @@ namespace inmobiliaria.Repositories
       cmd.Parameters.AddWithValue("@idUsuarioAnulador", IdUsuarioAnulador);
       cmd.ExecuteNonQuery();
     }
+    public void CancelarPagosPorContrato(int idContrato, DateTime fechaCancelacion)
+    {
+      using var conn = Conexion.ObtenerConexion(_connectionString);
+      var cmd = new MySqlCommand("UPDATE pagos SET estado = 'anulado' WHERE id_contrato = @idContrato AND fecha_vencimiento >= @fechaVencimiento AND estado = 'pendiente'", conn);
+      cmd.Parameters.AddWithValue("@idContrato", idContrato);
+      cmd.Parameters.AddWithValue("@fechaCancelacion", fechaCancelacion);
+      cmd.Parameters.AddWithValue("@fechaVencimiento", fechaCancelacion);
+      cmd.ExecuteNonQuery();
+    }
     private static Pago MapearPago(IDataRecord reader)
     {
       return new Pago
@@ -152,7 +189,8 @@ namespace inmobiliaria.Repositories
         IdPago = reader.GetInt32(reader.GetOrdinal("id_pago")),
         IdContrato = reader.GetInt32(reader.GetOrdinal("id_contrato")),
         NumeroPago = reader.GetInt32(reader.GetOrdinal("numero_pago")),
-        FechaPago = reader.GetDateTime(reader.GetOrdinal("fecha_pago")),
+        FechaVencimiento = reader.GetDateTime(reader.GetOrdinal("fecha_vencimiento")),
+        FechaPago = reader.IsDBNull(reader.GetOrdinal("fecha_pago")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_pago")),
         Detalle = reader.IsDBNull(reader.GetOrdinal("detalle")) ? null : reader.GetString(reader.GetOrdinal("detalle")),
         Importe = reader.GetDecimal(reader.GetOrdinal("importe")),
         Estado = reader.IsDBNull(reader.GetOrdinal("estado")) ? null : reader.GetString(reader.GetOrdinal("estado")),

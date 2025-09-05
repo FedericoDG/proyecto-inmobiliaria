@@ -117,10 +117,24 @@ namespace inmobiliaria.Controllers
       {
         if (ModelState.IsValid)
         {
-          pago.IdPago = id;
-          _pagoDao.ActualizarPago(pago);
+          var pagoOriginal = _pagoDao.ObtenerPorId(id);
+          if (pagoOriginal == null)
+            return NotFound();
+          pagoOriginal.Detalle = pago.Detalle;
+          pagoOriginal.Estado = pago.Estado;
+          // Asignar la fecha de pago desde el modelo recibido
+          pagoOriginal.FechaPago = pago.FechaPago;
+          if (pago.Estado == "anulado")
+          {
+            pagoOriginal.IdUsuarioAnulador = int.Parse(User.FindFirst("Id")!.Value);
+          }
+          else
+          {
+            pagoOriginal.IdUsuarioAnulador = null;
+          }
+          _pagoDao.ActualizarPago(pagoOriginal);
           TempData["Mensaje"] = "Pago editado correctamente.";
-          return RedirectToAction("Index");
+          return RedirectToAction("Detalle", "Contrato", new { id = pagoOriginal.IdContrato });
         }
         return View(pago);
       }

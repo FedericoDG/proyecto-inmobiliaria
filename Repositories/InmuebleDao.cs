@@ -9,6 +9,29 @@ namespace inmobiliaria.Repositories
     {
         private readonly string _connectionString = connectionString;
 
+        public List<Inmueble> ObtenerTodos(bool soloActivos = true)
+        {
+            try
+            {
+                var lista = new List<Inmueble>();
+                using var conn = Conexion.ObtenerConexion(_connectionString);
+                string sql = soloActivos ? "SELECT * FROM inmuebles WHERE activo = 1" : "SELECT * FROM inmuebles";
+                using var cmd = new MySqlCommand(sql, conn);
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(MapearInmueble(reader));
+                }
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return new List<Inmueble>();
+            }
+        }
+
+
         // Filtra inmuebles por propietario, estado y fechas de ocupación
         public List<Inmueble> ObtenerFiltrados(int page, int pageSize, int? propietarioId, string? estado, DateTime? fechaInicio, DateTime? fechaFin)
         {
@@ -92,28 +115,6 @@ namespace inmobiliaria.Repositories
                 return 0;
             }
         }
-
-        public List<Inmueble> ObtenerTodos()
-        {
-            try
-            {
-                var lista = new List<Inmueble>();
-                using var conn = Conexion.ObtenerConexion(_connectionString);
-                using var cmd = new MySqlCommand("SELECT * FROM inmuebles WHERE activo = 1", conn);
-                using var reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    lista.Add(MapearInmueble(reader));
-                }
-                return lista;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return new List<Inmueble>();
-            }
-        }
-
 
         public List<Inmueble> ObtenerPaginadosPorEstado(int page, int pageSize, string? estado)
         {

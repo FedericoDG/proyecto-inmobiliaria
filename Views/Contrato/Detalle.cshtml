@@ -1,3 +1,18 @@
+@if (TempData["Mensaje"] != null)
+{
+  <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+    @TempData["Mensaje"]
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+  </div>
+}
+
+@if (TempData["Error"] != null)
+{
+  <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+    @TempData["Error"]
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+  </div>
+}
 @model inmobiliaria.Models.Contrato
 @{
   ViewData["Title"] = "Detalle Contrato";
@@ -22,41 +37,65 @@
   </div>
 </div>
 
+
 <div class="container">
-  <div class="row justify-content-center p-4">
-    <div class="col-lg-5 mb-4">
-      <div class="card shadow-sm border-0 h-100">
-        <div class="card-body">
-          <dl class="row mb-0">
-            <dt class="col-sm-4">Inquilino</dt>
-            <dd class="col-sm-8">@ViewBag.Inquilino</dd>
-            <dt class="col-sm-4">Inmueble</dt>
-            <dd class="col-sm-8">@ViewBag.Inmueble</dd>
-            <dt class="col-sm-4">Usuario Creador</dt>
-            <dd class="col-sm-8">@ViewBag.UsuarioCreador</dd>
-            <dt class="col-sm-4">Usuario Finalizador</dt>
-            <dd class="col-sm-8">@ViewBag.UsuarioFinalizador</dd>
-            <dt class="col-sm-4">Fecha de Inicio</dt>
-            <dd class="col-sm-8">@Model.FechaInicio.ToShortDateString()</dd>
-            <dt class="col-sm-4">Fecha de Finalización</dt>
-            <dd class="col-sm-8">@Model.FechaFinOriginal.ToShortDateString()</dd>
-            <dt class="col-sm-4">Fecha Fin Anticipada</dt>
-            <dd class="col-sm-8">@(Model.FechaFinAnticipada.HasValue ?
-                            Model.FechaFinAnticipada.Value.ToShortDateString() : "-")</dd>
-            <dt class="col-sm-4">Monto Mensual</dt>
-            <dd class="col-sm-8">$@Model.MontoMensual</dd>
-            <dt class="col-sm-4">Estado</dt>
-            <dd class="col-sm-8">@Model.Estado</dd>
-            <dt class="col-sm-4">Multa</dt>
-            <dd class="col-sm-8">@(Model.Multa.HasValue ? "$" + Model.Multa.Value.ToString() : "-")</dd>
-          </dl>
+  <div class="row p-4">
+    <div class="col-12 mb-4">
+      <div class="card shadow-sm border-0 w-100">
+        <div class="card-header bg-primary text-white">
+          <i class="bi bi-info-circle me-2"></i>Detalles del contrato
+        </div>
+        <div class="card-body px-4 py-3">
+          <div class="row g-3">
+            <div class="col-md-6 col-lg-4">
+              <div class="fw-bold text-secondary">Inquilino</div>
+              <div class="text-dark">@ViewBag.Inquilino</div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="fw-bold text-secondary">Inmueble</div>
+              <div class="text-dark">@ViewBag.Inmueble</div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="fw-bold text-secondary">Usuario Creador</div>
+              <div class="text-dark">@ViewBag.UsuarioCreador</div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="fw-bold text-secondary">Usuario Finalizador</div>
+              <div class="text-dark">@ViewBag.UsuarioFinalizador</div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="fw-bold text-secondary">Fecha de Inicio</div>
+              <div class="text-dark">@Model.FechaInicio.ToShortDateString()</div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="fw-bold text-secondary">Fecha de Finalización</div>
+              <div class="text-dark">@Model.FechaFinOriginal.ToShortDateString()</div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="fw-bold text-secondary">Fecha Fin Anticipada</div>
+              <div class="text-dark">@(Model.FechaFinAnticipada.HasValue ?
+                                Model.FechaFinAnticipada.Value.ToShortDateString() : "-")</div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="fw-bold text-secondary">Monto Mensual</div>
+              <div class="text-dark">$@Model.MontoMensual</div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="fw-bold text-secondary">Estado</div>
+              <div class="text-dark">@Model.Estado</div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+              <div class="fw-bold text-secondary">Multa</div>
+              <div class="text-dark">@(Model.Multa.HasValue ? "$" + Model.Multa.Value.ToString() : "-")</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-lg-7 mb-4">
+    <div class="col-12">
       @if (ViewBag.Pagos != null && ((IEnumerable<inmobiliaria.Models.Pago>)ViewBag.Pagos).Any())
       {
-        <div class="card shadow-sm border-0 h-100 p-1">
+        <div class="card shadow-sm border-0 w-100 p-1">
           <div class="card-header bg-primary text-white">
             <i class="bi bi-cash-coin me-2"></i>Pagos asociados a este contrato
           </div>
@@ -66,7 +105,8 @@
                 <thead class="table-primary">
                   <tr>
                     <th>Número</th>
-                    <th>Fecha</th>
+                    <th>Fecha Venc.</th>
+                    <th>Fecha Pago</th>
                     <th>Detalle</th>
                     <th>Importe</th>
                     <th>Estado</th>
@@ -74,27 +114,43 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @foreach (var pago in (IEnumerable<inmobiliaria.Models.Pago>)ViewBag.Pagos)
+                  @{
+                    var pagosList = ((IEnumerable<inmobiliaria.Models.Pago>)ViewBag.Pagos).ToList();
+                  }
+                  @for (int i = 0; i < pagosList.Count; i++)
                   {
+                    var pago = pagosList[i];
+                    bool habilitado = i == 0 || (pagosList[i - 1].Estado == "realizado" || pagosList[i - 1].Estado ==
+                    "anulado");
                     <tr>
                       <td>@pago.NumeroPago</td>
-                      <td>@pago.FechaPago.ToShortDateString()</td>
-                      <td>@pago.Detalle</td>
+                      <td>@pago.FechaVencimiento.ToShortDateString()</td>
+                      <td>@(pago.FechaPago == DateTime.MinValue ? "---" : pago.FechaPago.ToShortDateString())</td>
+                      <td style="max-width:450px; word-break:break-word; white-space:pre-line;">@pago.Detalle</td>
                       <td>$@pago.Importe</td>
-                      <td>@pago.Estado</td>
-                      <td class="text-center">
-                        @if (pago.Estado != "anulado")
+                      <td>
+                        @if (pago.Estado == "realizado")
                         {
-                          <form method="post" action="/panel/pagos/anular/@pago.IdPago" style="display:inline">
-                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Anular">
-                              <i class="bi bi-x-circle"></i> Anular
-                            </button>
-                          </form>
+                          <span class="badge rounded-pill bg-success px-3 py-2">Realizado</span>
+                        }
+                        else if (pago.Estado == "pendiente")
+                        {
+                          <span class="badge rounded-pill bg-warning text-dark px-3 py-2">Pendiente</span>
+                        }
+                        else if (pago.Estado == "anulado")
+                        {
+                          <span class="badge rounded-pill bg-danger px-3 py-2">Anulado</span>
                         }
                         else
                         {
-                          <span class="text-danger"></span>
+                          <span class="badge rounded-pill bg-secondary px-3 py-2">@pago.Estado</span>
                         }
+                      </td>
+                      <td class="text-center">
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                          data-bs-target="#modalEditarPago_@pago.NumeroPago" @(habilitado ? "" : "disabled")>
+                          <i class="bi bi-pencil"></i> Editar pago
+                        </button>
                       </td>
                     </tr>
                   }
@@ -104,56 +160,70 @@
           </div>
         </div>
       }
-      @if (Model.Estado == "vigente")
-      {
-        <div class="text-end mt-3">
-          <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#modalNuevoPago">
-            <i class="bi bi-plus-circle me-1"></i> Cargar un nuevo pago
-          </button>
-        </div>
-      }
     </div>
   </div>
 </div>
 
-<!-- Modal para crear nuevo pago -->
-<div class="modal fade" id="modalNuevoPago" tabindex="-1" aria-labelledby="modalNuevoPagoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalNuevoPagoLabel">Cargar un nuevo pago</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        <form id="formNuevoPago" method="post" action="/panel/pagos/crear">
-          <input type="hidden" name="IdContrato" value="@Model.IdContrato" />
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label for="NumeroPago" class="form-label">Número de Pago</label>
-              <input name="NumeroPago" type="number" class="form-control" required />
+@if (ViewBag.Pagos != null && ((IEnumerable<inmobiliaria.Models.Pago>)ViewBag.Pagos).Any())
+{
+  foreach (var pagoModal in (IEnumerable<inmobiliaria.Models.Pago>)ViewBag.Pagos)
+  {
+    <div class="modal fade" id="modalEditarPago_@pagoModal.NumeroPago" tabindex="-1"
+      aria-labelledby="modalEditarPagoLabel_@pagoModal.NumeroPago" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="post" action="/panel/pagos/editar/@pagoModal.IdPago">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalEditarPagoLabel_@pagoModal.NumeroPago">
+                Pago del @pagoModal.FechaVencimiento.ToString("dd/MM/yyyy")
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="col-md-6">
-              <label for="FechaPago" class="form-label">Fecha de Pago</label>
-              <input name="FechaPago" type="date" class="form-control" required />
+            <div class="modal-body">
+              <input type="hidden" name="IdPago" value="@pagoModal.IdPago" />
+              <input type="hidden" name="IdContrato" value="@pagoModal.IdContrato" />
+              <div class="mb-3">
+                <label class="form-label">Número de Pago</label>
+                <input name="NumeroPago" type="number" class="form-control" value="@pagoModal.NumeroPago" required
+                  readonly />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Fecha de Pago</label>
+                <input name="FechaPago" type="date" class="form-control"
+                  value="@(pagoModal.FechaPago == DateTime.MinValue ? DateTime.Today.ToString("yyyy-MM-dd") : pagoModal.FechaPago.ToString("yyyy-MM-dd"))"
+                  required />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Detalle</label>
+                <textarea name="Detalle" class="form-control" rows="2">@pagoModal.Detalle</textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Importe</label>
+                <input name="Importe" type="number" step="0.01" class="form-control"
+                  value="@(pagoModal.Importe.ToString(System.Globalization.CultureInfo.InvariantCulture))" required
+                  readonly />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Estado</label>
+                <select name="Estado" class="form-select">
+                  <option value="pendiente" selected="@(pagoModal.Estado == "pendiente" ? "selected" : null)">Pendiente
+                  </option>
+                  <option value="realizado" selected="@(pagoModal.Estado == "realizado" ? "selected" : null)">Realizado
+                  </option>
+                  <option value="anulado" selected="@(pagoModal.Estado == "anulado" ? "selected" : null)">Anulado</option>
+                </select>
+              </div>
             </div>
-            <div class="col-md-6">
-              <label for="Importe" class="form-label">Importe</label>
-              <input name="Importe" type="number" step="0.01" class="form-control" required />
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="submit" class="btn btn-primary">Guardar cambios</button>
             </div>
-            <div class="col-12">
-              <label for="Detalle" class="form-label">Detalle</label>
-              <textarea name="Detalle" class="form-control" rows="3"></textarea>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="submit" class="btn btn-primary" form="formNuevoPago">Guardar</button>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+  }
+}
 
 @section Scripts {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">

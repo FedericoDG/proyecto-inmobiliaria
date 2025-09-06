@@ -10,6 +10,8 @@ namespace inmobiliaria.Controllers
   public class PagoController(IConfiguration config) : Controller
   {
     private readonly PagoDao _pagoDao = new(config.GetConnectionString("MySqlConnection")!);
+    private readonly ContratoDao _contratoDao = new(config.GetConnectionString("MySqlConnection")!);
+    private readonly InmuebleDao _inmuebleDao = new(config.GetConnectionString("MySqlConnection")!);
 
     // GET: /panel/pagos?page=1&pageSize=10
     [HttpGet("")]
@@ -17,13 +19,21 @@ namespace inmobiliaria.Controllers
     {
       try
       {
-        var total = _pagoDao.ContarPagos();
-        var pagos = _pagoDao.ObtenerPaginados(page, pageSize);
+        string? estado = Request.Query["estado"].ToString();
+        var total = _pagoDao.ContarPagosPorEstado(estado);
+        var pagos = _pagoDao.ObtenerPaginadosPorEstado(page, pageSize, estado);
 
+        // Obtener contratos e inmuebles para mostrar dirección
+        var contratos = _contratoDao.ObtenerTodos();
+        var inmuebles = _inmuebleDao.ObtenerTodos();
+
+        ViewBag.Contratos = contratos;
+        ViewBag.Inmuebles = inmuebles;
         ViewBag.Page = page;
         ViewBag.PageSize = pageSize;
         ViewBag.Total = total;
         ViewBag.TotalPages = (int)Math.Ceiling((double)total / pageSize);
+        ViewBag.EstadoSeleccionado = estado;
 
         return View(pagos);
       }
@@ -117,10 +127,24 @@ namespace inmobiliaria.Controllers
       {
         if (ModelState.IsValid)
         {
-          pago.IdPago = id;
-          _pagoDao.ActualizarPago(pago);
+          var pagoOriginal = _pagoDao.ObtenerPorId(id);
+          if (pagoOriginal == null)
+            return NotFound();
+          pagoOriginal.Detalle = pago.Detalle;
+          pagoOriginal.Estado = pago.Estado;
+          // Asignar la fecha de pago desde el modelo recibido
+          pagoOriginal.FechaPago = pago.FechaPago;
+          if (pago.Estado == "anulado")
+          {
+            pagoOriginal.IdUsuarioAnulador = int.Parse(User.FindFirst("Id")!.Value);
+          }
+          else
+          {
+            pagoOriginal.IdUsuarioAnulador = null;
+          }
+          _pagoDao.ActualizarPago(pagoOriginal);
           TempData["Mensaje"] = "Pago editado correctamente.";
-          return RedirectToAction("Index");
+          return RedirectToAction("Detalle", "Contrato", new { id = pagoOriginal.IdContrato });
         }
         return View(pago);
       }
@@ -170,6 +194,14 @@ namespace inmobiliaria.Controllers
         // Manejo de error
         return RedirectToAction("Error", "Error", new { mensaje = ex.Message });
       }
+    }
+
+    // GET: /panel/pagos/buscar-contratos-vigentes?dni=...
+    [HttpGet("buscar-contratos-vigentes")]
+    public IActionResult BuscarContratosVigentes(string dni)
+    {
+      var contratos = _pagoDao.BuscarContratosVigentesPorDni(dni);
+      return Json(contratos);
     }
   }
 }

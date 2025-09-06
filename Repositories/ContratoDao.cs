@@ -9,6 +9,29 @@ namespace inmobiliaria.Repositories
   {
     private readonly string _connectionString = connectionString;
 
+    public List<Contrato> ObtenerTodos()
+    {
+      try
+      {
+        var lista = new List<Contrato>();
+        using var conn = Conexion.ObtenerConexion(_connectionString);
+        string sql = "SELECT * FROM contratos";
+        using var cmd = new MySqlCommand(sql, conn);
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+          lista.Add(MapearContrato(reader));
+        }
+        return lista;
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine(ex);
+        return [];
+      }
+    }
+
+
     public int ContarContratosVigentesPorFechas(DateTime desde, DateTime hasta)
     {
       try
@@ -368,7 +391,7 @@ namespace inmobiliaria.Repositories
       catch (Exception ex)
       {
         Console.WriteLine(ex);
-        return new List<dynamic>();
+        return [];
       }
     }
   }

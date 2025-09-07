@@ -1,4 +1,3 @@
-using System;
 using System.Data;
 using MySql.Data.MySqlClient;
 using inmobiliaria.Data;

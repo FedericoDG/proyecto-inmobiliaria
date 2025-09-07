@@ -90,14 +90,16 @@ namespace inmobiliaria.Repositories
             }
         }
 
-        public List<Propietario> BuscarPorDni(string dni)
+        public List<Propietario> BuscarPorDni(string dni, int page = 1, int pageSize = 10)
         {
             try
             {
                 var lista = new List<Propietario>();
                 using var conn = Conexion.ObtenerConexion(_connectionString);
-                using var cmd = new MySqlCommand("SELECT * FROM propietarios WHERE dni LIKE @dni AND activo = 1", conn);
+                using var cmd = new MySqlCommand("SELECT * FROM propietarios WHERE dni LIKE @dni AND activo = 1 LIMIT @limit OFFSET @offset", conn);
                 cmd.Parameters.AddWithValue("@dni", $"%{dni}%");
+                cmd.Parameters.AddWithValue("@limit", pageSize);
+                cmd.Parameters.AddWithValue("@offset", (page - 1) * pageSize);
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {

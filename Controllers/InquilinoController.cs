@@ -17,13 +17,25 @@ namespace inmobiliaria.Controllers
         {
             try
             {
-                var total = _inquilinoDao.ContarInquilinos();
-                var inquilinos = _inquilinoDao.ObtenerPaginados(page, pageSize);
+                string dni = Request.Query["dni"].ToString();
+                List<Inquilino> inquilinos;
+                int total;
+                if (!string.IsNullOrEmpty(dni))
+                {
+                    inquilinos = _inquilinoDao.BuscarPorDni(dni, page, pageSize);
+                    total = _inquilinoDao.BuscarPorDni(dni, 1, int.MaxValue).Count;
+                }
+                else
+                {
+                    total = _inquilinoDao.ContarInquilinos();
+                    inquilinos = _inquilinoDao.ObtenerPaginados(page, pageSize);
+                }
 
                 ViewBag.Page = page;
                 ViewBag.PageSize = pageSize;
                 ViewBag.Total = total;
                 ViewBag.TotalPages = (int)Math.Ceiling((double)total / pageSize);
+                ViewBag.DniFiltro = dni;
 
                 return View(inquilinos);
             }

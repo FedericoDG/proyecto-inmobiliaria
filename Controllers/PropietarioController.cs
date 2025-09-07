@@ -17,13 +17,26 @@ namespace inmobiliaria.Controllers
     {
       try
       {
-        var total = _propietarioDao.ContarPropietarios();
-        var propietarios = _propietarioDao.ObtenerPaginados(page, pageSize);
+        string dni = Request.Query["dni"].ToString();
+        List<Propietario> propietarios;
+        int total;
+        if (!string.IsNullOrEmpty(dni))
+        {
+          propietarios = _propietarioDao.BuscarPorDni(dni, page, pageSize);
+          // Para paginación correcta, contar todos los que matchean
+          total = _propietarioDao.BuscarPorDni(dni, 1, int.MaxValue).Count;
+        }
+        else
+        {
+          total = _propietarioDao.ContarPropietarios();
+          propietarios = _propietarioDao.ObtenerPaginados(page, pageSize);
+        }
 
         ViewBag.Page = page;
         ViewBag.PageSize = pageSize;
         ViewBag.Total = total;
         ViewBag.TotalPages = (int)Math.Ceiling((double)total / pageSize);
+        ViewBag.DniFiltro = dni;
 
         return View(propietarios);
       }

@@ -4,70 +4,93 @@
 }
 
 <div class="container py-4">
-    <h2 class="mb-4 text-center fw-bold">PANEL PRINCIPAL</h2>
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow border-0 bg-gradient bg-primary text-white text-center py-2">
+                <div class="card-body py-3">
+                    <i class="bi bi-grid-1x2-fill fs-2 mb-2"></i>
+                    <h2 class="fw-bold mb-1">Panel de Gestión</h2>
+                    <p class="mb-0 small">Accede rápidamente a la administración de propietarios, inquilinos, inmuebles,
+                        contratos y pagos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         <div class="col-md-4 col-lg-3">
             <a href="/panel/propietarios" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 text-center">
+                <div class="card shadow-sm border-0 h-100 text-center card-panel card-panel-propietarios">
                     <div class="card-body py-4">
-                        <i class="bi bi-person-badge fs-1 text-primary mb-2"></i>
+                        <div class="icon-circle bg-primary mb-2 mx-auto">
+                            <i class="bi bi-person-badge fs-2 text-white"></i>
+                        </div>
                         <h5 class="card-title">Propietarios</h5>
-                        <p class="card-text text-muted">Gestión de propietarios</p>
+                        <p class="card-text text-white">Gestión de propietarios</p>
                     </div>
                 </div>
             </a>
         </div>
         <div class="col-md-4 col-lg-3">
             <a href="/panel/inquilinos" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 text-center">
+                <div class="card shadow-sm border-0 h-100 text-center card-panel card-panel-inquilinos">
                     <div class="card-body py-4">
-                        <i class="bi bi-person-lines-fill fs-1 text-primary mb-2"></i>
+                        <div class="icon-circle bg-success mb-2 mx-auto">
+                            <i class="bi bi-person-lines-fill fs-2 text-white"></i>
+                        </div>
                         <h5 class="card-title">Inquilinos</h5>
-                        <p class="card-text text-muted">Gestión de inquilinos</p>
+                        <p class="card-text text-white">Gestión de inquilinos</p>
                     </div>
                 </div>
             </a>
         </div>
         <div class="col-md-4 col-lg-3">
             <a href="/panel/inmuebles" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 text-center">
+                <div class="card shadow-sm border-0 h-100 text-center card-panel card-panel-inmuebles">
                     <div class="card-body py-4">
-                        <i class="bi bi-house-door fs-1 text-primary mb-2"></i>
+                        <div class="icon-circle bg-info mb-2 mx-auto">
+                            <i class="bi bi-house-door fs-2 text-white"></i>
+                        </div>
                         <h5 class="card-title">Inmuebles</h5>
-                        <p class="card-text text-muted">Gestión de inmuebles</p>
+                        <p class="card-text text-white">Gestión de inmuebles</p>
                     </div>
                 </div>
             </a>
         </div>
         <div class="col-md-4 col-lg-3">
             <a href="/panel/tipos-inmueble" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 text-center">
+                <div class="card shadow-sm border-0 h-100 text-center card-panel card-panel-tipos">
                     <div class="card-body py-4">
-                        <i class="bi bi-building-add fs-1 text-primary mb-2"></i>
+                        <div class="icon-circle bg-warning mb-2 mx-auto">
+                            <i class="bi bi-building-add fs-2 text-white"></i>
+                        </div>
                         <h5 class="card-title">Tipos de Inmueble</h5>
-                        <p class="card-text text-muted">Gestión de tipos de inmueble</p>
+                        <p class="card-text text-white">Gestión de tipos de inmueble</p>
                     </div>
                 </div>
             </a>
         </div>
         <div class="col-md-4 col-lg-3">
             <a href="/panel/contratos" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 text-center">
+                <div class="card shadow-sm border-0 h-100 text-center card-panel card-panel-contratos">
                     <div class="card-body py-4">
-                        <i class="bi bi-file-earmark-text fs-1 text-primary mb-2"></i>
+                        <div class="icon-circle bg-secondary mb-2 mx-auto">
+                            <i class="bi bi-file-earmark-text fs-2 text-white"></i>
+                        </div>
                         <h5 class="card-title">Contratos</h5>
-                        <p class="card-text text-muted">Gestión de contratos</p>
+                        <p class="card-text text-white">Gestión de contratos</p>
                     </div>
                 </div>
             </a>
         </div>
         <div class="col-md-4 col-lg-3">
             <a href="/panel/pagos" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 text-center">
+                <div class="card shadow-sm border-0 h-100 text-center card-panel card-panel-pagos">
                     <div class="card-body py-4">
-                        <i class="bi bi-cash-coin fs-1 text-primary mb-2"></i>
+                        <div class="icon-circle bg-danger mb-2 mx-auto">
+                            <i class="bi bi-cash-coin fs-2 text-white"></i>
+                        </div>
                         <h5 class="card-title">Pagos</h5>
-                        <p class="card-text text-muted">Gestión de pagos</p>
+                        <p class="card-text text-white">Gestión de pagos</p>
                     </div>
                 </div>
             </a>
@@ -77,15 +100,37 @@
         {
             <div class="col-md-4 col-lg-3">
                 <a href="/panel/usuarios" class="text-decoration-none">
-                    <div class="card shadow-sm border-0 h-100 text-center">
+                    <div class="card shadow-sm border-0 h-100 text-center card-panel card-panel-usuarios">
                         <div class="card-body py-4">
-                            <i class="bi bi-person-circle fs-1 text-primary mb-2"></i>
+                            <div class="icon-circle bg-dark mb-2 mx-auto">
+                                <i class="bi bi-person-circle fs-2 text-white"></i>
+                            </div>
                             <h5 class="card-title">Usuarios</h5>
-                            <p class="card-text text-muted">Gestión de usuarios</p>
+                            <p class="card-text text-white">Gestión de usuarios</p>
                         </div>
                     </div>
                 </a>
             </div>
         }
     </div>
+    <style>
+        .icon-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-panel {
+            transition: box-shadow 0.2s;
+        }
+
+        .card-panel:hover {
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+        }
+    </style>
+</div>
 </div>

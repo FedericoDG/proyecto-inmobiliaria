@@ -26,11 +26,11 @@ namespace inmobiliaria.Models
 
         [Required(ErrorMessage = "La fecha de inicio es obligatoria")]
         [Column("fecha_inicio")]
-        public DateTime FechaInicio { get; set; }
+        public DateTime? FechaInicio { get; set; }
 
         [Required(ErrorMessage = "La fecha de finalización original es obligatoria")]
         [Column("fecha_fin_original")]
-        public DateTime FechaFinOriginal { get; set; }
+        public DateTime? FechaFinOriginal { get; set; }
 
         [Column("fecha_fin_anticipada")]
         public DateTime? FechaFinAnticipada { get; set; }

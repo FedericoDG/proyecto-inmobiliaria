@@ -41,12 +41,12 @@
               </div>
               <div class="col-md-6">
                 <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
-                <input asp-for="FechaInicio" class="form-control" type="date" required />
+                <input asp-for="FechaInicio" class="form-control" type="date" />
                 <span asp-validation-for="FechaInicio" class="text-danger small"></span>
               </div>
               <div class="col-md-6">
                 <label asp-for="FechaFinOriginal" class="form-label">Fecha de Finalización</label>
-                <input asp-for="FechaFinOriginal" class="form-control" type="date" required />
+                <input asp-for="FechaFinOriginal" class="form-control" type="date" />
                 <span asp-validation-for="FechaFinOriginal" class="text-danger small"></span>
               </div>
               <div class="col-md-6">
@@ -54,6 +54,17 @@
                 <input asp-for="MontoMensual" class="form-control" id="MontoMensual"
                   value="@(ViewBag.MontoSugerido ?? "")" />
                 <span asp-validation-for="MontoMensual" class="text-danger small"></span>
+              </div>
+              <div class="col-md-6">
+                <label for="CantidadCuotas" class="form-label">Cantidad de cuotas</label>
+                <input type="number" class="form-control" id="CantidadCuotas" name="CantidadCuotas" min="1" />
+                @{
+                  var erroresCuotas = ViewData.ModelState["CantidadCuotas"]?.Errors;
+                  if (erroresCuotas != null && erroresCuotas.Count > 0)
+                  {
+                    <span class="text-danger small">@erroresCuotas[0].ErrorMessage</span>
+                  }
+                }
               </div>
             </div>
             <div class="d-flex justify-content-end gap-2 mt-4">
@@ -249,6 +260,16 @@
                   inputFechaFin.value = fechaFinModal;
                   inputFechaInicio.readOnly = true;
                   inputFechaFin.readOnly = true;
+                  // Calcular cantidad de cuotas (meses completos entre fechas)
+                  const inputCuotas = document.getElementById('CantidadCuotas');
+                  if (fechaInicioModal && fechaFinModal) {
+                    const inicio = new Date(fechaInicioModal);
+                    const fin = new Date(fechaFinModal);
+                    let meses = (fin.getFullYear() - inicio.getFullYear()) * 12 + (fin.getMonth() - inicio.getMonth()) + 1;
+                    inputCuotas.value = meses > 0 ? meses : 1;
+                  } else {
+                    inputCuotas.value = '';
+                  }
                   const modal = bootstrap.Modal.getInstance(document.getElementById('modalBuscarInmueble'));
                   modal.hide();
                 });

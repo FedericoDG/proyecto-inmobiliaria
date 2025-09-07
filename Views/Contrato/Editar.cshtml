@@ -163,8 +163,8 @@
     document.addEventListener('DOMContentLoaded', function () {
       const fechaFinAnticipadaInput = document.getElementById('FechaFinAnticipada');
       const multaInput = document.getElementById('Multa');
-      const fechaFinOriginal = '@Model.FechaFinOriginal.ToString("yyyy-MM-dd")';
-      const fechaInicio = '@Model.FechaInicio.ToString("yyyy-MM-dd")';
+      const fechaFinOriginal = '@(Model.FechaFinOriginal.HasValue? Model.FechaFinOriginal.Value.ToString("yyyy-MM-dd") : "")';
+      const fechaInicio = '@(Model.FechaInicio.HasValue? Model.FechaInicio.Value.ToString("yyyy-MM-dd") : "")';
       const montoMensual = parseFloat('@Model.MontoMensual');
       const resultadoMulta = document.getElementById('resultadoMulta');
 

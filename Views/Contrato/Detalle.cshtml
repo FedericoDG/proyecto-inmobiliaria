@@ -65,11 +65,13 @@
             </div>
             <div class="col-md-6 col-lg-4">
               <div class="fw-bold text-secondary">Fecha de Inicio</div>
-              <div class="text-dark">@Model.FechaInicio.ToShortDateString()</div>
+              <div class="text-dark">@(Model.FechaInicio.HasValue? Model.FechaInicio.Value.ToShortDateString() : "-")
+              </div>
             </div>
             <div class="col-md-6 col-lg-4">
               <div class="fw-bold text-secondary">Fecha de Finalización</div>
-              <div class="text-dark">@Model.FechaFinOriginal.ToShortDateString()</div>
+              <div class="text-dark">@(Model.FechaFinOriginal.HasValue ?
+                                Model.FechaFinOriginal.Value.ToShortDateString() : "-")</div>
             </div>
             <div class="col-md-6 col-lg-4">
               <div class="fw-bold text-secondary">Fecha Fin Anticipada</div>

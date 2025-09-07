@@ -260,7 +260,6 @@ namespace inmobiliaria.Repositories
 
         public void ActualizarEstado(int idInmueble, string nuevoEstado)
         {
-            Console.WriteLine($"ActualizarEstado llamado con idInmueble={idInmueble}, nuevoEstado={nuevoEstado}");
             using var conn = Conexion.ObtenerConexion(_connectionString);
             var query = "UPDATE inmuebles SET estado = @estado WHERE id_inmueble = @idInmueble";
             using var command = new MySqlCommand(query, conn);
@@ -305,12 +304,7 @@ namespace inmobiliaria.Repositories
                     command.Parameters.AddWithValue("@fechaInicio", fechaInicio.Value.ToString("yyyy-MM-dd"));
                     command.Parameters.AddWithValue("@fechaFin", fechaFin.Value.ToString("yyyy-MM-dd"));
                 }
-                // Imprimir la query y los valores de los parámetros
-                Console.WriteLine($"BuscarDisponibles SQL: {query}");
-                foreach (MySqlParameter p in command.Parameters)
-                {
-                    Console.WriteLine($"  Param: {p.ParameterName} = {p.Value}");
-                }
+
                 using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
@@ -319,7 +313,6 @@ namespace inmobiliaria.Repositories
             }
             catch (Exception ex)
             {
-                // Loguear el error para depuración
                 Console.WriteLine($"Error en BuscarDisponibles: {ex.Message}");
             }
             return lista;

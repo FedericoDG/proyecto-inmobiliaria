@@ -142,9 +142,17 @@ namespace inmobiliaria.Controllers
     {
       try
       {
-        // Calcular cantidad de cuotas mensuales
-        var cantDePagos = ((contrato.FechaFinOriginal.Year - contrato.FechaInicio.Year) * 12) + (contrato.FechaFinOriginal.Month - contrato.FechaInicio.Month);
-        Console.WriteLine($"Cantidad de cuotas mensuales: {cantDePagos}");
+        // Usar la cantidad de cuotas enviada desde el formulario
+        int cantDePagos = 0;
+        bool cuotasValidas = false;
+        if (Request.Form.ContainsKey("CantidadCuotas"))
+        {
+          cuotasValidas = int.TryParse(Request.Form["CantidadCuotas"], out cantDePagos) && cantDePagos > 0;
+        }
+        if (!cuotasValidas)
+        {
+          ModelState.AddModelError("CantidadCuotas", "La cantidad de cuotas es obligatoria");
+        }
 
         // Asignar el usuario logueado como creador
         var idUsuario = int.Parse(User.FindFirst("Id")!.Value);
@@ -159,7 +167,7 @@ namespace inmobiliaria.Controllers
           // Crear los pagos pendientes asociados al contrato
           if (contrato.MontoMensual.HasValue)
           {
-            _pagoDao.CrearPagosPendientes(idContratoCreado, contrato.FechaInicio, cantDePagos, contrato.MontoMensual.Value, idUsuarioLoagueado);
+            _pagoDao.CrearPagosPendientes(idContratoCreado, contrato.FechaInicio!.Value, cantDePagos, contrato.MontoMensual.Value, idUsuarioLoagueado);
           }
 
           // Actualizar estado del inmueble a 'ocupado' de forma simple
@@ -303,7 +311,6 @@ namespace inmobiliaria.Controllers
     {
       try
       {
-        Console.WriteLine($"Rescindiendo contrato {IdContrato} con fecha {FechaFinAnticipada} y multa {Multa}");
         var contrato = _contratoDao.ObtenerPorId(IdContrato);
         if (contrato == null)
           return NotFound();

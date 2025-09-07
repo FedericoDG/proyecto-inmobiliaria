@@ -108,8 +108,8 @@
             }
             @(inq != null ? inq.Nombre + " " + inq.Apellido + " (" + inq.Dni + ")" : "-")
           </td>
-          <td>@c.FechaInicio.ToShortDateString()</td>
-          <td>@c.FechaFinOriginal.ToShortDateString()</td>
+          <td>@(c.FechaInicio.HasValue? c.FechaInicio.Value.ToShortDateString() : "")</td>
+          <td>@(c.FechaFinOriginal.HasValue? c.FechaFinOriginal.Value.ToShortDateString() : "")</td>
           <td>@c.MontoMensual</td>
           <td>@c.Estado</td>
           <td class="text-center">

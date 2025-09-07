@@ -18,7 +18,7 @@ namespace inmobiliaria.Repositories
         var cmdInq = new MySqlCommand("SELECT id_inquilino FROM inquilinos WHERE dni LIKE @dni", conn);
         cmdInq.Parameters.AddWithValue("@dni", "%" + dni + "%");
         var idInquilino = cmdInq.ExecuteScalar();
-        Console.WriteLine($"idInquilino: {idInquilino}");
+
         if (idInquilino == null) return resultados;
 
         // Buscar contratos vigentes para ese inquilino
@@ -211,7 +211,6 @@ namespace inmobiliaria.Repositories
     {
       try
       {
-        Console.WriteLine(pago); // llega como 0001-01-01
         using var conn = Conexion.ObtenerConexion(_connectionString);
         var cmd = new MySqlCommand(@"UPDATE pagos SET id_contrato = @id_contrato, numero_pago = @numero_pago, fecha_pago = @fecha_pago, detalle = @detalle, importe = @importe, estado = @estado, id_usuario_creador = @id_usuario_creador, id_usuario_anulador = @id_usuario_anulador WHERE id_pago = @id_pago", conn);
         cmd.Parameters.AddWithValue("@id_pago", pago.IdPago);

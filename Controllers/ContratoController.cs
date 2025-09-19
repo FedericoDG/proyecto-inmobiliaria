@@ -315,6 +315,34 @@ namespace inmobiliaria.Controllers
         if (contrato == null)
           return NotFound();
 
+        // Cálculo de multa
+        if (contrato.FechaInicio.HasValue && contrato.FechaFinOriginal.HasValue)
+        {
+          var inicio = contrato.FechaInicio.Value;
+          var finOriginal = contrato.FechaFinOriginal.Value;
+          var finAnticipada = FechaFinAnticipada;
+
+          // Cálculo de meses transcurridos y total
+          int mesesOriginal = (finOriginal.Year - inicio.Year) * 12 + (finOriginal.Month - inicio.Month);
+          int mesesAnticipada = (finAnticipada.Year - inicio.Year) * 12 + (finAnticipada.Month - inicio.Month);
+          int mitadContrato = mesesOriginal / 2;
+
+          // Cálculo de multa
+          decimal multaCalculada = contrato.MontoMensual ?? 0;
+          if (mesesAnticipada < mitadContrato)
+          {
+            multaCalculada *= 2;
+          }
+          Console.WriteLine($"[Rescindir] Multa calculada en el Controlador: {multaCalculada}. Multa calculada en la vista: {Multa}");
+
+          // if (Math.Abs(multaCalculada - Multa) > 0.01m) // tolerancia de 1 centavo, antes puse multaCalculada != Multa y obviamente eran siempre distintas
+          // {
+          //   TempData["Error"] = "La multa calculada no coincide. Verifique los datos.";
+          //   return RedirectToAction("Index");
+          // }
+        }
+        //
+
         contrato.Estado = "rescindido";
         contrato.FechaFinAnticipada = FechaFinAnticipada;
         contrato.Multa = Multa;

@@ -151,6 +151,15 @@ namespace inmobiliaria.Repositories
             return cmd.ExecuteNonQuery() > 0;
         }
 
+        public bool VerificarContrasena(int idUsuario, string contrasenaActual)
+        {
+            var usuario = ObtenerPorId(idUsuario);
+            if (usuario == null) return false;
+            var hasher = new PasswordHasher<Usuario>();
+            var resultado = hasher.VerifyHashedPassword(usuario, usuario.Contrasena, contrasenaActual);
+            return resultado == PasswordVerificationResult.Success;
+        }
+
         private Usuario MapearUsuario(IDataRecord reader)
         {
             return new Usuario

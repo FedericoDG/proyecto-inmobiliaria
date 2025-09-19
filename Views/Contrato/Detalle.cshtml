@@ -55,14 +55,22 @@
               <div class="fw-bold text-secondary">Inmueble</div>
               <div class="text-dark">@ViewBag.Inmueble</div>
             </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="fw-bold text-secondary">Usuario Creador</div>
-              <div class="text-dark">@ViewBag.UsuarioCreador</div>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <div class="fw-bold text-secondary">Usuario Finalizador</div>
-              <div class="text-dark">@ViewBag.UsuarioFinalizador</div>
-            </div>
+            @if (User.IsInRole("administrador"))
+            {
+
+              <div class="col-md-6 col-lg-4">
+                <div class="fw-bold text-secondary">Usuario Creador</div>
+                <div class="text-dark">@ViewBag.UsuarioCreador</div>
+              </div>
+            }
+            @if (User.IsInRole("administrador"))
+            {
+
+              <div class="col-md-6 col-lg-4">
+                <div class="fw-bold text-secondary">Usuario Finalizador</div>
+                <div class="text-dark">@ViewBag.UsuarioFinalizador</div>
+              </div>
+            }
             <div class="col-md-6 col-lg-4">
               <div class="fw-bold text-secondary">Fecha de Inicio</div>
               <div class="text-dark">@(Model.FechaInicio.HasValue? Model.FechaInicio.Value.ToShortDateString() : "-")

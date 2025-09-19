@@ -13,19 +13,27 @@
           <span class="fs-5">Mi Perfil</span>
         </div>
         <div class="card-body p-4">
+          <div class="mb-3 text-center">
+            @{
+              var nombre = Model.Nombre ?? "Usuario";
+              var apellido = Model.Apellido ?? "";
+              var nombreApellido = $"{nombre} {apellido}".Trim();
+              var avatarClaim = User.FindFirst("Avatar")?.Value;
+              var avatarUrl = !string.IsNullOrEmpty(avatarClaim)
+              ? (avatarClaim.StartsWith("/img/") ? avatarClaim + "?v=" + Guid.NewGuid() : avatarClaim)
+              : $"https://ui-avatars.com/api/?name={nombreApellido}&background=0D8ABC&color=fff&size=32";
+            }
+            <img src="@avatarUrl" alt="Avatar" class="rounded-circle shadow" style="width: 100px; height: 100px;">
+          </div>
+          <!-- Formulario para eliminar foto de perfil, fuera del form principal -->
+          <div class="w-100 my-3 text-center">
+            <form method="post" action="/panel/perfil/eliminar-foto" style="display:inline-block; margin-top: 1rem;">
+              <button type="submit" class="btn btn-danger btn-sm">
+                <i class="bi bi-trash"></i> Eliminar foto de perfil
+              </button>
+            </form>
+          </div>
           <form asp-action="Perfil" method="post" enctype="multipart/form-data" autocomplete="off">
-            <div class="mb-3 text-center">
-              @{
-                var nombre = Model.Nombre ?? "Usuario";
-                var apellido = Model.Apellido ?? "";
-                var nombreApellido = $"{nombre} {apellido}".Trim();
-                var avatarClaim = User.FindFirst("Avatar")?.Value;
-                var avatarUrl = !string.IsNullOrEmpty(avatarClaim)
-                ? (avatarClaim.StartsWith("/img/") ? avatarClaim + "?v=" + Guid.NewGuid() : avatarClaim)
-                : $"https://ui-avatars.com/api/?name={nombreApellido}&background=0D8ABC&color=fff&size=32";
-              }
-              <img src="@avatarUrl" alt="Avatar" class="rounded-circle shadow" style="width: 100px; height: 100px;">
-            </div>
             <div class="mb-3">
               <label asp-for="Avatar" class="form-label">Actualizar Avatar</label>
               <input type="file" name="AvatarFile" class="form-control" accept="image/*" />
@@ -45,7 +53,16 @@
               </div>
             </div>
             <div class="row g-3 mt-2">
-              <div class="col-md-6">
+              <div class="col-md-4">
+                <label for="ContrasenaActual" class="form-label">Contraseña actual</label>
+                <input type="password" name="ContrasenaActual" id="ContrasenaActual" class="form-control"
+                  autocomplete="current-password" />
+                @if (ViewBag.ErrorContrasenaActual != null)
+                {
+                  <div class="text-danger small mt-1">@ViewBag.ErrorContrasenaActual</div>
+                }
+              </div>
+              <div class="col-md-4">
                 <label for="NuevaContrasena" class="form-label">Nueva Contraseña</label>
                 <input type="password" name="NuevaContrasena" id="NuevaContrasena" class="form-control"
                   autocomplete="new-password" />
@@ -59,7 +76,7 @@
                   }
                 }
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <label for="ConfirmarContrasena" class="form-label">Confirmar Contraseña</label>
                 <input type="password" name="ConfirmarContrasena" id="ConfirmarContrasena" class="form-control"
                   autocomplete="new-password" />

@@ -28,9 +28,6 @@ namespace inmobiliaria.Controllers
         [Authorize]
         public IActionResult Perfil()
         {
-            if (!(User.Identity?.IsAuthenticated ?? false))
-                return RedirectToAction("Login", "Autenticacion");
-
             var idClaim = User.FindFirst("Id");
             if (idClaim == null)
                 return RedirectToAction("Login", "Autenticacion");
@@ -43,7 +40,7 @@ namespace inmobiliaria.Controllers
         // POST: /panel/perfil
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Perfil(string? NuevaContrasena, string? ConfirmarContrasena, IFormFile? AvatarFile)
+        public async Task<IActionResult> Perfil(string? ContrasenaActual, string? NuevaContrasena, string? ConfirmarContrasena, IFormFile? AvatarFile)
         {
             if (!(User.Identity?.IsAuthenticated ?? false))
                 return RedirectToAction("Login", "Autenticacion");
@@ -97,10 +94,19 @@ namespace inmobiliaria.Controllers
             }
 
             // Actualizar contraseña si se ingresó y coincide
-            if (!string.IsNullOrEmpty(NuevaContrasena))
+            if (!string.IsNullOrEmpty(NuevaContrasena) && !string.IsNullOrEmpty(ContrasenaActual))
             {
+                var esContrasenaValida = _usuarioDao.VerificarContrasena(idUsuario, ContrasenaActual);
+
+                if (!esContrasenaValida)
+                {
+                    ViewBag.ErrorContrasenaActual = "La contraseña actual es incorrecta.";
+                    return View(usuario);
+                }
+
                 if (NuevaContrasena == ConfirmarContrasena)
                 {
+
                     _usuarioDao.ActualizarContrasena(idUsuario, NuevaContrasena);
                     cambioContrasena = true;
                 }
@@ -127,6 +133,55 @@ namespace inmobiliaria.Controllers
                 ViewBag.LogoutEn3s = false;
             }
             return View(usuario);
+        }
+        // POST: /panel/perfil/eliminar-foto
+        [Authorize]
+        [HttpPost]
+        [Route("panel/perfil/eliminar-foto")]
+        public async Task<IActionResult> EliminarFoto()
+        {
+            var idClaim = User.FindFirst("Id");
+            if (idClaim == null)
+            {
+                return RedirectToAction("Login", "Autenticacion");
+            }
+
+            var idUsuario = int.Parse(idClaim.Value);
+            var usuario = _usuarioDao.ObtenerPorId(idUsuario);
+            if (usuario == null) return NotFound();
+
+            // Eliminar archivo físico si existe y es personalizado
+            if (!string.IsNullOrEmpty(usuario.Avatar) && usuario.Avatar.StartsWith("/img/"))
+            {
+                var imgPath = Path.Combine(_env.WebRootPath, usuario.Avatar.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                if (System.IO.File.Exists(imgPath))
+                {
+                    try { System.IO.File.Delete(imgPath); } catch { }
+                }
+                else
+                {
+                    Console.WriteLine("[EliminarFoto] Archivo de avatar NO existe");
+                }
+            }
+
+            // Limpiar avatar en BD
+            usuario.Avatar = null;
+            _usuarioDao.ActualizarAvatar(idUsuario, null);
+
+            // Limpiar claim de avatar en sesión
+            var claims = User.Claims.ToList();
+            var identity = (System.Security.Claims.ClaimsIdentity)User.Identity!;
+            var avatarClaim = claims.FirstOrDefault(c => c.Type == "Avatar");
+            if (avatarClaim != null)
+                identity.RemoveClaim(avatarClaim);
+
+            // Agregar claim vacío para evitar errores en la vista
+            identity.AddClaim(new System.Security.Claims.Claim("Avatar", ""));
+            await HttpContext.SignInAsync(
+                "authCookie",
+                new System.Security.Claims.ClaimsPrincipal(identity)
+            );
+            return RedirectToAction("Perfil");
         }
     }
 }

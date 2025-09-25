@@ -48,7 +48,15 @@ INSERT INTO `inquilinos` (`id_inquilino`, `dni`, `nombre`, `apellido`, `telefono
 (1, '10663789', 'Susana', 'García', '26660896456', 'susanagarcia@mail.com', 'San Martín 789', 1),
 (2, '28805905', 'Daniel', 'Pallero', '26660852321', 'danielpallero@mail.com', 'Mitre 1554', 1),
 (3, '35789412', 'Juan Carlos', 'Olmedo', '26650899661', 'juancarlosolmedo@mail.com', 'La Madrid 158', 1),
-(4, '42889455', 'Viviana', 'Silva', '26650834551', 'vivianasilva@mail.com', 'Aviador Franco 577', 1);
+(4, '42889455', 'Viviana', 'Silva', '26650834551', 'vivianasilva@mail.com', 'Aviador Franco 577', 1),
+(5, '42889577', 'Luis', 'Peralta', '2664036228', 'luisperalta@mail.com', 'Mendoza 1238', 1),
+(6, '42866667', 'Miguel', 'Ramos', '2664033428', 'miguelramos@mail.com', 'Mendoza 36', 1),
+(7, '28126758', 'Lorena', 'Camargo', '2666676228', 'lorenacamargo@mail.com', 'Río Primero 238', 1),
+(8, '19125874', 'Felipe', 'Gallo', '2664038898', 'felipegallo@mail.com', '9 de julio 355', 1),
+(9, '36974124', 'Orlando', 'Funes', '2664045110', 'orlandofunes@mail.com', 'Santa Fe 655', 1),
+(10, '40112974', 'Marianela', 'Hidalgo', '2665036733', 'marianelahidalgo@mail.com', 'Santa Rosa 551', 1),
+(11, '12154474', 'virginia', 'Carreras', '2664037812', 'virginiacarreras@mail.com', 'Córdoba 665', 1),
+(12, '90125125', 'Soledad', 'Sánchez', '2664236228', 'soledadsanchez@mail.com', 'Catamarca 1544', 1);
 
 --
 -- Estructura de tabla para la tabla `pagos`
@@ -88,7 +96,16 @@ CREATE TABLE `propietarios` (
 INSERT INTO `propietarios` (`id_propietario`, `dni`, `nombre`, `apellido`, `telefono`, `email`, `direccion`, `activo`) VALUES
 (1, '23578966', 'Gustavo', 'Ochoa', '2665064940', 'gustavoochoa@mail.com', 'Lima 890', 1),
 (2, '5515237', 'María', 'Lozada', '2665014150', 'marialozada@mail.com', 'Roma 358', 1),
-(3, '25789644', 'Carlos Augusto', 'Pereira', '266607841110', 'carlosaugustopereira@mail.com', 'Pasaje Rincón 87', 1);
+(3, '28189411', 'Carlos Augusto', 'Pereira', '2665015250', 'carlosaugustopereira@mail.com', 'Pasaje Rincón 87', 1),
+(4, '28179644', 'Consuelo', 'Pereira', '2665014150', 'consuelopereira@mail.com', 'Pasaje Rincón 87', 1),
+(5, '28125411', 'Mariana', 'Lópex', '2664564150', 'marianalopez@mail.com', 'Pasaje Rincón 87', 1),
+(6, '37411002', 'Cecilia', 'Amadeo', '2665064250', 'ceciliaamadeo@mail.com', 'Pasaje Rincón 87', 1),
+(7, '25741129', 'Claudia', 'Bausili', '2665574360', 'claudiabausili@mail.com', 'Pasaje Rincón 87', 1),
+(8, '29114710', 'Daniel', 'Carmona', '2665045697', 'danielcarmona@mail.com', 'Pasaje Rincón 87', 1),
+(9, '16574129', 'Silvio', 'Flores', '2665412360', 'silvioflores@mail.com', 'Pasaje Rincón 87', 1),
+(10, '12134154', 'Martín', 'Ripoll', '2665014775', 'martinripoll@mail.com', 'Pasaje Rincón 87', 1),
+(11, '40574369', 'Pascual', 'Allende', '26651236571', 'pascualallende@mail.com', 'Pasaje Rincón 87', 1);
+
 
 --
 -- Estructura de tabla para la tabla `tipos_inmueble`
@@ -155,7 +172,16 @@ CREATE TABLE `inmuebles` (
 INSERT INTO `inmuebles` (`id_inmueble`, `id_propietario`, `id_tipo`, `uso`, `direccion`, `cantidad_ambientes`, `coordenadas`, `precio`, `estado`, `activo`) VALUES
 (1, 2, 1, 'residencial', 'Calle Falsa 123', 2, '34.6037,-58.3816', 200000.00, 'disponible', 1),
 (2, 2, 1, 'residencial', 'Avenida Siempre Viva 742', 4, '34.6090,-58.3845', 175000.00, 'disponible', 1),
-(3, 3, 3, 'comercial', 'Boulevard Central 456', NULL, '34.6118,-58.4173', 1200000.00, 'disponible', 1);
+(3, 3, 3, 'comercial', 'Boulevard Central 456', 1, '34.6118,-58.4173', 1200000.00, 'disponible', 1),
+(4, 3, 2, 'residencial', 'Roma 1587', 3, NULL, 380000.00, 'disponible', 1),
+(5, 4, 2, 'residencial', 'Aviador Franco 15', 4, NULL, 42000.00, 'disponible', 1),
+(6, 5, 2, 'residencial', 'San Francisco 788', 3, NULL, 390000.00, 'disponible', 1),
+(7, 6, 3, 'comercial', 'Mendoza 56', 1, NULL, 521000.00, 'disponible', 1),
+(8, 9, 4, 'residencial', 'Pje. Don Bosco 56', 3, NULL, 650000.00, 'disponible', 1),
+(9, 11, 4, 'comercial', 'Moreno 157', 2, NULL, 455000.00, 'disponible', 1),
+(10, 8, 1, 'residencial', 'Ovidio Lagos 157', 2, NULL, 220000.00, 'disponible', 1),
+(11, 9, 1, 'residencial', 'Rivera Indarte 688', 2, NULL, 205000.00, 'disponible', 1),
+(12, 10, 3, 'comercial', 'Viedma 874', 1, NULL, 453000.00, 'suspendido', 1);
 --
 -- Indices de la tabla `contratos`
 --

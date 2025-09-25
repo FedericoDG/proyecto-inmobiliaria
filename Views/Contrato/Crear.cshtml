@@ -265,7 +265,7 @@
                   if (fechaInicioModal && fechaFinModal) {
                     const inicio = new Date(fechaInicioModal);
                     const fin = new Date(fechaFinModal);
-                    let meses = (fin.getFullYear() - inicio.getFullYear()) * 12 + (fin.getMonth() - inicio.getMonth()) + 1;
+                    let meses = (fin.getFullYear() - inicio.getFullYear()) * 12 + (fin.getMonth() - inicio.getMonth());
                     inputCuotas.value = meses > 0 ? meses : 1;
                   } else {
                     inputCuotas.value = '';

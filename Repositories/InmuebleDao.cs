@@ -284,10 +284,11 @@ namespace inmobiliaria.Repositories
                 if (fechaInicio != null && fechaFin != null)
                 {
                     query += @" AND NOT EXISTS (
-                                SELECT 1 FROM contratos c
-                                WHERE c.id_inmueble = inmuebles.id_inmueble
-                                  AND NOT (c.fecha_fin_original < @fechaInicio OR c.fecha_inicio > @fechaFin)
-                            )";
+                                                SELECT 1 FROM contratos c
+                                                WHERE c.id_inmueble = inmuebles.id_inmueble
+                                                AND c.estado = 'vigente'
+                                                AND NOT (c.fecha_fin_original < @fechaInicio OR c.fecha_inicio > @fechaFin)
+                                                )";
                 }
 
                 using var command = new MySqlCommand(query, conn);
